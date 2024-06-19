@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PHPUnit">
+    <option name="directories">
+      <list>
+        <option value="$PROJECT_DIR$/PerfectLink/tests/Unit" />
+        <option value="$PROJECT_DIR$/PerfectLink/tests/Feature" />
+        <option value="$PROJECT_DIR$/permission_tutorial/tests/Unit" />
+        <option value="$PROJECT_DIR$/permission_tutorial/tests/Feature" />
+        <option value="$PROJECT_DIR$/project-front-back/tests/Unit" />
+        <option value="$PROJECT_DIR$/project-front-back/tests/Feature" />
+        <option value="$PROJECT_DIR$/project-back/tests/Unit" />
+        <option value="$PROJECT_DIR$/project-back/tests/Feature" />
+      </list>
+    </option>
+  </component>
+</project>

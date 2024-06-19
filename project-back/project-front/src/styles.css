@@ -1,0 +1,263 @@
+@font-face {
+   font-family: 'DancingScript';
+   src: url(./fonts/DancingScript-Regular.ttf);
+}
+
+@font-face {
+   font-family: 'Quicksand';
+   src: url(./fonts/Quicksand-Regular.ttf);
+}
+
+* {
+   font-family: 'Quicksand';
+}
+
+textarea {
+   width: 100%;
+   height: 100px;
+   padding: 12px 20px;
+   box-sizing: border-box;
+   border: 1px solid #ccc;
+   border-radius: 4px;
+   background-color: #f8f8f8;
+   font-size: 16px;
+   resize: none;
+}
+
+textarea:focus {
+   outline: none;
+   border: 1px solid #706f6f;
+}
+
+.revertedBusIcon {
+   display: inline-block;
+   transform: scaleX(-1);
+}
+
+#containerDefault {
+   
+   min-height: 100vh;
+   padding-top: 5em;
+   padding-bottom: 5em;
+   background: rgb(232, 211, 206);
+   background: radial-gradient(circle, rgba(232, 211, 206, 1) 40%, rgba(198, 190, 198, 1) 100%);
+}
+
+#containerTables {
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100vw;
+   height: 100vh;
+   overflow: hidden;
+}
+
+#containerHome {
+   position: absolute;
+   margin-top: 60px;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: -webkit-fill-available;
+}
+
+
+
+/* ----------------LOGIN/REGISTER---------------- */
+
+
+#containerLoginRegister {
+   position: relative;
+   background: rgb(232, 211, 206);
+   background: radial-gradient(circle, rgba(232, 211, 206, 1) 40%, rgba(198, 190, 198, 1) 100%);
+}
+
+.boxRL {
+   top: 5vh;
+   position: relative;
+}
+
+.titleRL {
+   font-family: 'DancingScript';
+   font-size: 50px;
+}
+
+
+/* ----------------HOME---------------- */
+
+#title {
+   font-family: 'DancingScript';
+   font-size: 80px;
+   color: #4d515db9;
+   background-color: rgb(108, 117, 125, .6);
+}
+
+
+#banner {
+   height: 350px;
+   background-image: url('./images/home/banner.jpg');
+   background-repeat: no-repeat;
+   background-size: cover;
+}
+
+#logo {
+   background-position: left center;
+   width: 120px;
+   height: 52px;
+   background-image: url('./images/home/logo.png');
+   background-repeat: no-repeat;
+   background-size: contain;
+}
+
+
+
+/* ----------------WEDDING MAIN---------------- */
+
+#containerMainWedding {
+   height: 100dvw;
+   /* 
+   background-image: url(./images/mainWedding/background-flowers.jpg);
+   background-repeat: no-repeat;
+   background-size: contain; */
+}
+
+#imageCouple {
+   border-radius: 10px;
+   height: 100%;
+   background-image: url('./images/mainWedding/couple.jpg');;
+   background-repeat: no-repeat;
+   background-size: contain;
+}
+
+#imgPrewedding {
+   height: 100%;
+   background-image: url('./images/mainWedding/cups.png');
+   background-repeat: no-repeat;
+   background-size: contain;
+}
+
+#imgNoCeremony {
+   height: 93%;
+   background-image: url('./images/mainWedding/law.jpg');
+   background-repeat: no-repeat;
+   background-position: bottom right;
+   background-size: contain;
+}
+
+#imgCeremony {
+   height: 100%;
+   background-image: url('./images/mainWedding/church2.jpg');
+   background-repeat: no-repeat;
+   background-size: contain;
+}
+
+#imgParty {
+   height: 100%;
+   background-image: url('./images/mainWedding/party.jpg');
+   background-repeat: no-repeat;
+   background-size: contain;
+}
+
+/* ----------------WEDDING INFO---------------- */
+
+/* #image{
+   height: 100%;
+   background-image: url('../images/default/default.jpg');
+   background-repeat: no-repeat;
+   background-size: contain;
+   transition: transform 0.3s ease-in-out;
+}
+#image:hover{
+   transform: scale(1.2);
+} */
+
+
+/* ----------------WEDDING TABLES---------------- */
+
+
+/* #gridBackground {
+   background-size: 25px 25px;
+   background-image:
+      linear-gradient(to right, rgba(211, 211, 211, 0.278) 1px, transparent 1px),
+      linear-gradient(to bottom, lightgrey 1px, transparent 1px);
+   z-index: -1;
+} */
+
+.table {
+   height: 200px;
+   width: 200px;
+   border: 1px solid black;
+   border-radius: 50%;
+   background-color: #4d515d;
+   position: relative;
+   color: white;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   margin: 0;
+}
+
+.seat {
+   height: 50px;
+   width: 50px;
+   border: 1px solid black;
+   border-radius: 50%;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   background-color: #4d515d;
+   color: white;
+   position: absolute;
+}
+
+.empty-seat {
+   height: 50px;
+   width: 50px;
+   border: 1px dashed black;
+   border-radius: 50%;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   background-color: #4d515d5d;
+   color: white;
+   position: absolute;
+}
+
+
+
+/* ----------------DIALOG TABLE---------------- */
+
+#contentTableSeats {
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+   justify-content: space-around;
+   padding: 10px;
+   border-radius: 0.5em;
+   background-color: #f8f9fa;
+   border: 1px solid #dee2e6;
+}
+
+.tableSeat {
+   /* margin-top: 1em; */
+   border-radius: 0.5em;
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   padding: 10px;
+   cursor: move;
+}
+
+.tableSeatGuest {
+   background-color: lightgreen;
+   border: solid 1px white;
+}
+
+.tableSeatGuestMarked {
+   background-color: mediumseagreen;
+}
+
+.tableSeatEmpty {
+   border: dashed 1px grey;
+   color: grey;
+}
