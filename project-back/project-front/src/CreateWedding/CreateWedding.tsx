@@ -75,34 +75,34 @@ const CreateWedding = () => {
          redirect: "follow"
       };
 
-      // fetch(`${import.meta.env.VITE_HOST}weddings`, requestOptions)
-      //    .then((response) => response.json())
-      //    .then((result) => {
-      //       if (result.error) {
-      //          setAlertMessage(result.error);
-      //          setAlertVariant("error");
-      //          setShowAlert(true)
-      //          setLoading(false)
-      //          return;
-      //       } else {
-      //          console.log(result)
-      //          setAlertMessage("Creando sala de la boda...");
-      //          setAlertVariant("success");
-      //          setShowAlert(true);
-      //          localStorage.setItem("hasOwnWedding", JSON.stringify(result.id));
-      //          window.dispatchEvent(new Event("storage"));
-      //          setTimeout(() => {
-      //             navigate("/wedding/" + result.id);
-      //          }, 3000);
-      //       }
-      //    })
-      //    .catch((error) => {
-      //       console.log(error)
-      //       setAlertMessage("No se ha podido crear la boda");
-      //       setAlertVariant("error");
-      //       setShowAlert(true)
-      //       setLoading(false)
-      //    })
+      fetch(`${import.meta.env.VITE_HOST}weddings`, requestOptions)
+         .then((response) => response.json())
+         .then((result) => {
+            if (result.error) {
+               setAlertMessage(result.error);
+               setAlertVariant("error");
+               setShowAlert(true)
+               setLoading(false)
+               return;
+            } else {
+               console.log(result)
+               setAlertMessage("Creando sala de la boda...");
+               setAlertVariant("success");
+               setShowAlert(true);
+               localStorage.setItem("hasOwnWedding", JSON.stringify(result.id));
+               window.dispatchEvent(new Event("storage"));
+               setTimeout(() => {
+                  navigate("/wedding/" + result.id);
+               }, 3000);
+            }
+         })
+         .catch((error) => {
+            console.log(error)
+            setAlertMessage("No se ha podido crear la boda");
+            setAlertVariant("error");
+            setShowAlert(true)
+            setLoading(false)
+         })
    }
 
 

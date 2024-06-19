@@ -1,4 +1,4 @@
-import { Divider, Drawer, IconButton, List, ListItem, ListItemText, Tooltip } from "@mui/material"
+import { Divider, Drawer, IconButton, List, ListItem, ListItemText, Tooltip, Typography } from "@mui/material"
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { IGuest } from "./SpaceTables";
 import { useEffect, useState } from "react";
@@ -50,7 +50,11 @@ const ListGuests = (props: {
       >
          <h2 className="text-center">Invitados</h2>
          <h5 className="text-center">(confirmados)</h5>
-         <List>
+         {props.guests.length === 0 ? (<>
+         <div>
+            <Typography sx={{marginTop: 3, textAlign: 'center'}}>No hay invitados</Typography>
+         </div>
+         </>) : (<List>
             {groupedGuests.filter(gg => gg.guests.length > 0).map(gg => (
                <div key={gg.group}>
                   <Divider variant="fullWidth" />
@@ -85,8 +89,9 @@ const ListGuests = (props: {
                   ))}
                </div>
             ))}
-         </List>
-      </Drawer>
+         </List>)
+         }
+      </Drawer >
    )
 }
 
