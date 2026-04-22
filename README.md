@@ -2,7 +2,7 @@
 Proyecto FP Desarrollo de Aplicaciones Web - 2024
 
 *DISCLAIMER*
-Este proyecto fue desarrollado en el transcurso de 2-3 meses (compajinado con un horario de jornada completa en prácticas).
+Este proyecto fue desarrollado en el transcurso de 2-3 meses (compaginado con un horario de jornada completa en prácticas).
 No pretende ser una web funcional, simplemente demostrar los conocimientos adquiridos en el curso.
 *DISCLAIMER*
 
