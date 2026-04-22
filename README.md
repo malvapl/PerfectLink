@@ -25,7 +25,9 @@ PerfectLink es una aplicación web para planificación de bodas con un backend A
 - Servidor web (Apache/Nginx) con mod_rewrite habilitado (ej. XAMPP)
 
 ### Paso 1: Clonar el Proyecto
+Se debe colocar en la carpeta htdocs/ de xampp
 ```
+cd xampp/htdocs
 git clone https://github.com/tu-repo/PerfectLink.git
 cd PerfectLink
 ```
@@ -67,7 +69,7 @@ cd PerfectLink
    ```
 
 5. Servir el backend:
-   - Con XAMPP: Colocar en `htdocs`, acceder en `http://localhost/PerfectLink/public`.
+   - Con XAMPP: acceder en `http://localhost/PerfectLink/public`.
    - Alternativa: `php artisan serve` (ajustar URLs).
 
 ### Paso 3: Configurar el Frontend (React)
@@ -78,11 +80,15 @@ cd PerfectLink
    ```
 
 2. Configurar entorno:
-   - Crear `.env`:
+   - Crear `.env`
+   - Si se usó xampp para servir el backend:
      ```
      VITE_HOST=http://localhost/PerfectLink/public/api/
      ```
-
+   - Si se usó artisan serve:
+     ```
+     VITE_HOST=http://127.0.0.1:8000/api/
+     ```
 3. Iniciar servidor de desarrollo:
    ```
    npm run dev
@@ -91,7 +97,7 @@ cd PerfectLink
 
 ### Acceso a la Aplicación
 - **Frontend**: `http://localhost:5173`
-- **API Backend**: `http://localhost/PerfectLink/public/api/`
+- **API Backend**: `http://localhost/PerfectLink/public/api/` ó `http://127.0.0.1:8000/api/`
 
 ### Datos de Prueba
 Después de ejecutar `php artisan migrate --seed`, se crean usuarios y datos de ejemplo. Credenciales para iniciar sesión:
