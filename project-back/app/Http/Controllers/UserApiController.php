@@ -21,6 +21,12 @@ use Laravel\Sanctum\PersonalAccessToken;
 class UserApiController extends Controller
 {
 
+   /**
+    * Login user
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\JsonResponse token and idWedding if exists
+    */
    public function login(Request $request)
    {
       $credentials = $request->only('email', 'password');
@@ -41,6 +47,12 @@ class UserApiController extends Controller
       }
    }
 
+   /**
+    * Register user
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\JsonResponse user or error
+    */
    public function register(Request $request)
    {
       $validator = Validator::make($request->all(), [
@@ -66,6 +78,13 @@ class UserApiController extends Controller
       return response()->json($user);
    }
 
+   /**
+    * Check if user is assignable to the wedding and link them
+    * 
+    * @param Request $request
+    * @param string $code wedding code
+    * @return array|WeddingGeneralResource
+    */
    public function joinWedding(Request $request, string $code)
    {
       if ($request->bearerToken() !== null) {
@@ -108,6 +127,13 @@ class UserApiController extends Controller
       return new WeddingGeneralResource($wedding);
    }
 
+   /**
+    * Get user role in specific wedding
+    *
+    * @param Request $request
+    * @param int $idWedding
+    * @return array
+    */
    public function roleWedding(Request $request, int $idWedding)
    {
       if ($request->bearerToken() !== null) {
@@ -127,6 +153,12 @@ class UserApiController extends Controller
       return ['response' => $role, 'admin' => $isAdmin];
    }
 
+   /**
+    * Get weddings by user
+    *
+    * @param Request $request
+    * @return array|WeddingUserResource
+    */
    public function weddings(Request $request)
    {
       if ($request->bearerToken() !== null) {
@@ -142,18 +174,35 @@ class UserApiController extends Controller
       return WeddingUserResource::collection($weddings);
    }
 
+   /**
+    * Check if code is a guest code
+    *
+    * @param string $code
+    * @return array
+    */
    public function existsCodeGuest(string $code)
    {
       $wedding = Wedding::where('codeGuest', $code)->first();
       return !$wedding ? ['error' => 'not found'] : ['id' => $wedding->id];
    }
 
+   /**
+    * Check if code is a organizer code
+    *
+    * @param string $code
+    * @return array
+    */
    public function existsCodeOrg(string $code)
    {
       $wedding = Wedding::where('codeOrg', $code)->first();
       return !$wedding ? ['error' => 'not found'] : ['id' => $wedding->id];
    }
 
+   /**
+    * Check if user is admin
+    *
+    * @param Request $request
+    */
    public function isAdmin(Request $request)
    {
       if ($request->bearerToken() !== null) {

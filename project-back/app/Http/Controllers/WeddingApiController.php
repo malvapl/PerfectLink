@@ -56,7 +56,10 @@ class WeddingApiController extends Controller
    ];
 
    /**
-    * Display a listing of the resource.
+    * Get general data of all weddings
+    *
+    * @param Request $request
+    * @return array|ResourceCollection
     */
    public function index(Request $request)
    {
@@ -74,7 +77,10 @@ class WeddingApiController extends Controller
    }
 
    /**
-    * Display the specified resource.
+    * Get all wedding data
+    *
+    * @param string $id
+    * @return WeddingDetailResource
     */
    public function show(string $id)
    {
@@ -83,7 +89,11 @@ class WeddingApiController extends Controller
    }
 
    /**
-    * Display the specified resource.
+    * Get wedding info
+    *
+    * @param string $id
+    * @param Request $request
+    * @return array|ResourceCollection
     */
    public function getInfo(string $id, Request $request)
    {
@@ -106,7 +116,10 @@ class WeddingApiController extends Controller
    }
 
    /**
-    * Store a newly created resource in storage.
+    * Create wedding
+    *
+    * @param CreateWeddingRequest $request
+    * @return array
     */
    public function store(CreateWeddingRequest $request)
    {
@@ -160,6 +173,13 @@ class WeddingApiController extends Controller
       return ['id' => $wedding->id];
    }
 
+   /**
+    * Get weding buses
+    *
+    * @param string $idWedding
+    * @param Request $request
+    * @return array|ResourceCollection
+    */
    public function getBuses(string $idWedding, Request $request)
    {
       if ($request->bearerToken() !== null) {
@@ -184,6 +204,13 @@ class WeddingApiController extends Controller
       return new ResourceCollection(BusResource::collection($buses));
    }
 
+   /**
+    * Get prewedding data
+    *
+    * @param string $idWedding
+    * @param Request $request
+    * @return array|PreweddingResource
+    */
    public function getPrewedding(string $idWedding, Request $request)
    {
       if ($request->bearerToken() !== null) {
@@ -206,7 +233,11 @@ class WeddingApiController extends Controller
    }
 
    /**
-    * Update the main info of the wedding
+    * Update wedding data
+    *
+    * @param WeddingUpdateRequest $request
+    * @param string $idWedding
+    * @return array|WeddingGeneralResource
     */
    public function update(WeddingUpdateRequest $request, string $idWedding)
    {
@@ -241,6 +272,13 @@ class WeddingApiController extends Controller
       return new WeddingGeneralResource($wedding);
    }
 
+   /**
+    * Update bus data
+    *
+    * @param CreateBusWeddingRequest $request
+    * @param string $idWedding
+    * @return array|ResourceCollection
+    */
    public function updateBus(CreateBusWeddingRequest $request, string $idWedding)
    {
       if ($request->bearerToken() !== null) {
@@ -278,6 +316,13 @@ class WeddingApiController extends Controller
       return new ResourceCollection(BusResource::collection($wedding->buses()->get()));
    }
 
+   /**
+    * Create new bus
+    *
+    * @param CreateBusWeddingRequest $request
+    * @param string $idWedding
+    * @return array|BusResource
+    */
    public function addBus(CreateBusWeddingRequest $request, string $idWedding)
    {
       if ($request->bearerToken() !== null) {
@@ -303,6 +348,13 @@ class WeddingApiController extends Controller
       return new BusResource($bus);
    }
 
+   /**
+    * Update prewedding data
+    *
+    * @param UpdatePreweddingRequest $request
+    * @param string $idWedding
+    * @return array|ResourceCollection
+    */
    public function updatePrewedding(UpdatePreweddingRequest $request, string $idWedding)
    {
       if ($request->bearerToken() !== null) {
@@ -330,6 +382,13 @@ class WeddingApiController extends Controller
       return new ResourceCollection(PreweddingResource::collection($wedding->prewedding()->get()));
    }
 
+   /**
+    * Delete prewedding
+    *
+    * @param Request $request
+    * @param string $idWedding
+    * @return array
+    */
    public function cancelPrewedding(Request $request, string $idWedding)
    {
       if ($request->bearerToken() !== null) {
@@ -356,6 +415,13 @@ class WeddingApiController extends Controller
       return ['data' => 'success'];
    }
 
+   /**
+    * Delete wedding buses
+    *
+    * @param Request $request
+    * @param string $idWedding
+    * @return array
+    */
    public function cancelBuses(Request $request, string $idWedding)
    {
       if ($request->bearerToken() !== null) {
@@ -385,7 +451,11 @@ class WeddingApiController extends Controller
    }
 
    /**
-    * Adds info (custom or not) to the wedding
+    * Add info (custom or not) to the wedding
+    *
+    * @param CreateInfoWeddingRequest $request
+    * @param string $idWedding
+    * @return array|ResourceCollection
     */
    public function addInfoCards(CreateInfoWeddingRequest $request, string $idWedding)
    {
@@ -426,6 +496,13 @@ class WeddingApiController extends Controller
       return new ResourceCollection(InfoResource::collection($wedding->infos()->get()));
    }
 
+   /**
+    * Add info
+    *
+    * @param CreateInfoWeddingRequest $request
+    * @param string $idWedding
+    * @return array|InfoResource
+    */
    public function addInfoCard(CreateInfoWeddingRequest $request, string $idWedding)
    {
       if ($request->bearerToken() !== null) {
@@ -451,7 +528,11 @@ class WeddingApiController extends Controller
    }
 
    /**
-    * Remove the specified resource from storage.
+    * Deñete wedding
+    *
+    * @param Request $request
+    * @param string $idWedding
+    * @return array
     */
    public function destroy(Request $request, string $idWedding)
    {

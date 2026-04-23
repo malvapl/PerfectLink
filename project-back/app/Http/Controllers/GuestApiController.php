@@ -26,7 +26,10 @@ class GuestApiController extends Controller
 {
 
    /**
-    * Returns the guests of the specified wedding
+    * Return the guests of the specified wedding, along with the spouses
+    *
+    * @param string $id
+    * @return ResourceCollection
     */
    public function index(string $id)
    {
@@ -37,7 +40,10 @@ class GuestApiController extends Controller
    }
 
    /**
-    * Returns the CONFIRMED guests of the specified wedding that have not been assigned a table yet
+    * Return the CONFIRMED guests of the specified wedding that have not been assigned a table yet
+    *
+    * @param string $id
+    * @return array{data: array}
     */
    public function guestsNotSeated(string $id)
    {
@@ -59,6 +65,13 @@ class GuestApiController extends Controller
       return ['data' => GuestResource::customResourceTables($notSeatedGuests, $wedding->spouse1, $wedding->spouse2)];
    }
 
+   /**
+    * Confirm invite
+    *
+    * @param ConfirmationRequest $request
+    * @param int $idWedding
+    * @return array|string
+    */
    public function confirmInvite(ConfirmationRequest $request, int $idWedding)
    {
       if ($request->bearerToken() !== null) {
@@ -88,6 +101,13 @@ class GuestApiController extends Controller
       return $wedding->users()->where('user_id', $user->id)->get();
    }
 
+   /**
+    * Cancel invite
+    *
+    * @param Request $request
+    * @param int $idWedding
+    * @return array|string
+    */
    public function cancelInvite(Request $request, int $idWedding)
    {
       if ($request->bearerToken() !== null) {
@@ -115,7 +135,11 @@ class GuestApiController extends Controller
    }
 
    /**
-    * Calculates total of guests in the fields abilidated (bus, prewedding, confirmed)
+    * Calculate total of guests in the fields abilidated (bus, prewedding, confirmed)
+    *
+    * @param string $id wedding id
+    * @param Request $request
+    * @return array|string
     */
    public function dataGuests(string $id, Request $request)
    {
@@ -148,6 +172,13 @@ class GuestApiController extends Controller
       return ['confirmed' => $totalConfirmed, 'bus' => $totalBus, 'prewedding' => $totalPrewedding];
    }
 
+   /**
+    * Get guest groups by wedding
+    *
+    * @param Request $request
+    * @param string $id weddind id
+    * @return array|string
+    */
    public function guestGroups(Request $request, string $id)
    {
       if ($request->bearerToken() !== null) {
@@ -174,6 +205,14 @@ class GuestApiController extends Controller
       return $values;
    }
 
+   /**
+    * Update guest group in wedding
+    *
+    * @param Request $request
+    * @param string $idWedding
+    * @param string $idGuest
+    * @return array|string
+    */
    public function updateGroup(Request $request, string $idWedding, string $idGuest)
    {
       if ($request->bearerToken() !== null) {
@@ -209,8 +248,11 @@ class GuestApiController extends Controller
    }
 
    /**
-    * Removes the guests from the user_wedding table
-    * 
+    * Remove guests from wedding
+    *
+    * @param DeteleGuestsRequest $request
+    * @param string $idWedding
+    * @return array
     */
    public function delete(DeteleGuestsRequest $request, string $idWedding)
    {

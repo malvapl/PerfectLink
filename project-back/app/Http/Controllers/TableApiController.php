@@ -32,6 +32,13 @@ class TableApiController extends Controller
       return new TableResource($table);
    }
 
+   /**
+    * Update table, attach guests from scratch
+    *
+    * @param UpdateTableRequest $request
+    * @param Table $table
+    * @return array|\Illuminate\Database\Eloquent\Collection|\Illuminate\Http\JsonResponse
+    */
    public function updateTable(UpdateTableRequest $request, Table $table)
    {
       if ($request->bearerToken() !== null) {
@@ -70,6 +77,14 @@ class TableApiController extends Controller
       return new TableResource($table);
    }
 
+   /**
+    * Delete table
+    *
+    * @param Request $request
+    * @param Wedding $wedding
+    * @param string $id
+    * @return array
+    */
    public function destroyTable(Request $request, Wedding $wedding, string $id)
    {
       if ($request->bearerToken() !== null) {
