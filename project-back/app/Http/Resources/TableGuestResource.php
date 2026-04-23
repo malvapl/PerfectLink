@@ -12,11 +12,6 @@ class TableGuestResource extends JsonResource
    private static $plusOne;
    private static $group;
 
-   /**
-    * Transform the resource into an array.
-    *
-    * @return array<string, mixed>
-    */
    public function toArray(Request $request): array
    {
       return [
@@ -29,11 +24,6 @@ class TableGuestResource extends JsonResource
       ];
    }
 
-   /**
-    * Transform the resource into an array.
-    *
-    * @return array<string, mixed>
-    */
    public static function toArrayCustom($request): array
    {
       return [

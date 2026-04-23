@@ -11,18 +11,13 @@ class GuestResource extends JsonResource
     private static $spouse1;
     private static $spouse2;
 
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
             'name' => $this->name,
             'lastname' => $this->lastname,
-            'role' => $this->pivot->role_id, 
+            'role' => $this->pivot->role_id,
             'joined_at' => $this->pivot->created_at->format('d-m-Y'),
             'bus' => $this->pivot->bus,
             'prewedding' => $this->pivot->prewedding,
@@ -33,11 +28,6 @@ class GuestResource extends JsonResource
         ];
     }
 
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public static function toArrayCustom($request): array
     {
         return [
@@ -55,11 +45,6 @@ class GuestResource extends JsonResource
         ];
     }
 
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public static function toArrayCustomTables($request): array
     {
         return [
