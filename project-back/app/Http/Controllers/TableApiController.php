@@ -3,15 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateTableRequest;
-use App\Http\Requests\UpdateSeatsTableRequest;
 use App\Http\Requests\UpdateTableRequest;
-use App\Http\Resources\GuestResource;
 use App\Http\Resources\TableResource;
 use App\Models\Table;
 use App\Models\User;
 use App\Models\Wedding;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class TableApiController extends Controller

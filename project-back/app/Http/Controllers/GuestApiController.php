@@ -4,22 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ConfirmationRequest;
 use App\Http\Requests\DeteleGuestsRequest;
-use App\Http\Requests\UpdateGroupRequest;
 use App\Http\Resources\GuestResource;
-use App\Http\Resources\WeddingDetailResource;
-use App\Http\Resources\WeddingUserResource;
-use App\Models\Bus;
-use App\Models\Prewedding;
 use App\Models\Table;
 use App\Models\User;
 use App\Models\Wedding;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rules;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class GuestApiController extends Controller

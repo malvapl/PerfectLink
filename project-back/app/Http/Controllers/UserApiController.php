@@ -2,12 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ConfirmationRequest;
-use App\Http\Resources\WeddingDetailResource;
 use App\Http\Resources\WeddingGeneralResource;
 use App\Http\Resources\WeddingUserResource;
-use App\Models\Bus;
-use App\Models\Prewedding;
 use App\Models\User;
 use App\Models\Wedding;
 use Illuminate\Auth\Events\Registered;
