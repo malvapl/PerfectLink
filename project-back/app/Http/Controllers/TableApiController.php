@@ -9,7 +9,6 @@ use App\Models\Table;
 use App\Models\User;
 use App\Models\Wedding;
 use Illuminate\Http\Request;
-use Laravel\Sanctum\PersonalAccessToken;
 
 class TableApiController extends Controller
 {
@@ -19,10 +18,10 @@ class TableApiController extends Controller
       return ['data' => TableResource::customResource($tables, $wedding)];
    }
 
-   public function storeTable(CreateTableRequest $request, string $id)
+   public function storeTable(CreateTableRequest $request, string $idWedding)
    {
       $data = $request->all();
-      $data['wedding_id'] = $id;
+      $data['wedding_id'] = $idWedding;
       Table::create($data);
 
       $table = Table::latest()->with('users')->first();
@@ -31,10 +30,6 @@ class TableApiController extends Controller
 
    /**
     * Update table, attach guests from scratch
-    *
-    * @param UpdateTableRequest $request
-    * @param Table $table
-    * @return array|\Illuminate\Database\Eloquent\Collection|\Illuminate\Http\JsonResponse
     */
    public function updateTable(UpdateTableRequest $request, Table $table)
    {
@@ -45,18 +40,14 @@ class TableApiController extends Controller
          foreach ($table->users()->get() as $user) {
             $table->users()->detach($user->id);
          }
+
          foreach ($data['guests'] as $guest) {
-            // return $guest;
             $user = User::find($guest['id']);
             if (!$user) {
-               return response()->json(["Error" => "Usuario no encontrado"], 404);
+               return response()->json(['error' => 'Usuario no encontrado'], 404);
             }
 
-            if (str_contains($guest['name'], '(+1)')) {
-               $table->users()->attach($user->id, ['plusOne' => 1, 'numSeat' => $guest['numSeat']]);
-            } else {
-               $table->users()->attach($user->id, ['plusOne' => 0, 'numSeat' => $guest['numSeat']]);
-            }
+            $table->users()->attach($user->id, ['plusOne' => str_contains($guest['name'], '(+1)'), 'numSeat' => $guest['numSeat']]);
          }
       }
 
@@ -65,17 +56,9 @@ class TableApiController extends Controller
       return new TableResource($table);
    }
 
-   /**
-    * Delete table
-    *
-    * @param Request $request
-    * @param Wedding $wedding
-    * @param string $id
-    * @return array
-    */
-   public function destroyTable(Request $request, Wedding $wedding, string $id)
+   public function destroyTable(Request $request, Wedding $wedding, string $idTable)
    {
-      $wedding->tables()->find($id)->delete(); // TODO control fail
+      $wedding->tables()->find($idTable)->delete(); // TODO control fail
       return ['response' => 'success'];
    }
 }

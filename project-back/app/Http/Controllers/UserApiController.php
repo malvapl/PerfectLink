@@ -86,7 +86,7 @@ class UserApiController extends Controller
       $user = $request->user();
 
       if ($user->is_admin) {
-         return ["error" => "Los administradores no pueden ser invitados"];
+         return ['error' => 'Un administrador no puede participar en una boda'];
       }
 
       $wedding = Wedding::where('codeGuest', $code)->first();
@@ -96,23 +96,25 @@ class UserApiController extends Controller
             return ['error' => 'Wedding not found'];
          }
          if ($user->weddings()->withPivot('role_id')->where('role_id', 1)->count() !== 0) {
-            return ["error" => "Ya estás organizando una boda"];
+            return ['error' => 'Ya estás organizando una boda'];
          }
          if ($user->weddings()->withPivot('role_id')->whereIn('role_id', [2, 3])->pluck('wedding_id')->first() === $wedding->id) {
-            return ["error" => "Ya eres invitado de esta boda"];
+            return ['error' => 'Ya eres invitado de esta boda'];
          }
-         $bus = $wedding->bus ? 0 : null;
-         $prewedding = $wedding->prewedding ? 0 : null;
-         $wedding->users()->attach($id_user, ['role_id' => 1, 'bus' => $bus, 'prewedding' => $prewedding]);
+
+         $role = 1;
       } else {
          if ($user->weddings()->withPivot('role_id')->where('role_id', 1)->pluck('wedding_id')->first() === $wedding->id) {
-            return ["error" => "No puedes ser invitado de tu propia boda"];
+            return ['error' => 'No puedes ser invitado de tu propia boda'];
          }
-         $bus = $wedding->bus ? 0 : null;
-         $prewedding = $wedding->prewedding ? 0 : null;
-         $wedding->users()->attach($id_user, ['role_id' => 2, 'bus' => $bus, 'prewedding' => $prewedding]);
+
+         $role = 2;
          $wedding->increment('numGuests');
       }
+
+      $bus = $wedding->bus ? 0 : null;
+      $prewedding = $wedding->prewedding ? 0 : null;
+      $wedding->users()->attach($id_user, ['role_id' => $role, 'bus' => $bus, 'prewedding' => $prewedding]);
 
       return new WeddingGeneralResource($wedding);
    }
@@ -130,56 +132,49 @@ class UserApiController extends Controller
 
       $isAdmin = $user->is_admin;
       $wedding = $user->weddings()->withPivot('role_id')->where('wedding_id', $idWedding)->first();
-      if (!$wedding)
+      if (!$wedding) {
          return ['response' => 'none', 'admin' => $isAdmin];
+      }
+
       $role_id = $wedding->pivot->role_id;
       $role = DB::table('roles')->where('id', $role_id)->value('name');
+
       return ['response' => $role, 'admin' => $isAdmin];
    }
 
    /**
     * Get weddings by user
-    *
-    * @param Request $request
-    * @return array|WeddingUserResource
     */
    public function weddings(Request $request)
    {
       $user = $request->user();
 
-      $weddings = $user->weddings()->withPivot('role_id')
-         ->whereIn('role_id', [2, 3])->get();
+      $weddings = $user->weddings()->withPivot('role_id')->whereIn('role_id', [2, 3])->get();
       return WeddingUserResource::collection($weddings);
    }
 
    /**
     * Check if code is a guest code
-    *
-    * @param string $code
-    * @return array
     */
    public function existsCodeGuest(string $code)
    {
       $wedding = Wedding::where('codeGuest', $code)->first();
+
       return !$wedding ? ['error' => 'not found'] : ['id' => $wedding->id];
    }
 
    /**
     * Check if code is a organizer code
-    *
-    * @param string $code
-    * @return array
     */
    public function existsCodeOrg(string $code)
    {
       $wedding = Wedding::where('codeOrg', $code)->first();
+
       return !$wedding ? ['error' => 'not found'] : ['id' => $wedding->id];
    }
 
    /**
     * Check if user is admin
-    *
-    * @return bool
     */
    public function isAdmin(Request $request)
    {

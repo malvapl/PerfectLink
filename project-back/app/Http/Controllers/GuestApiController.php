@@ -18,30 +18,25 @@ class GuestApiController extends Controller
 
    /**
     * Return the guests of the specified wedding, along with the spouses
-    *
-    * @param string $id
-    * @return ResourceCollection
     */
-   public function index(string $id)
+   public function index(string $idWedding)
    {
-      $wedding = Wedding::with('users')->findOrFail($id);
+      $wedding = Wedding::with('users')->findOrFail($idWedding);
       $guests = $wedding->users()->withPivot('role_id', 'created_at', 'plusOne', 'infoMenu', 'suggestion', 'group')
          ->whereIn('role_id', [2, 3, 4])->get();
+
       return new ResourceCollection(GuestResource::customCollection($guests, $wedding->spouse1, $wedding->spouse2));
    }
 
    /**
     * Return the CONFIRMED guests of the specified wedding that have not been assigned a table yet
-    *
-    * @param string $id
-    * @return array{data: array}
     */
-   public function guestsNotSeated(string $id)
+   public function guestsNotSeated(string $idWedding)
    {
-      $wedding = Wedding::with('users', 'tables.users')->findOrFail($id);
+      $wedding = Wedding::with('users', 'tables.users')->findOrFail($idWedding);
       $guests = $wedding->users()->withPivot('role_id', 'created_at', 'group', 'plusOne')->where('role_id', 3)->get();
 
-      $tables = Table::where('wedding_id', $id)->get();
+      $tables = Table::where('wedding_id', $idWedding)->get();
       $seatedGuestIds = [];
       foreach ($tables as $table) {
          foreach ($table->users as $user) {
@@ -56,13 +51,6 @@ class GuestApiController extends Controller
       return ['data' => GuestResource::customResourceTables($notSeatedGuests, $wedding->spouse1, $wedding->spouse2)];
    }
 
-   /**
-    * Confirm invite
-    *
-    * @param ConfirmationRequest $request
-    * @param int $idWedding
-    * @return array|string
-    */
    public function confirmInvite(ConfirmationRequest $request, int $idWedding)
    {
       $user = $request->user();
@@ -71,7 +59,7 @@ class GuestApiController extends Controller
       $data = $request->all();
       $wedding = $user->weddings()->with('users')->withPivot('role_id')->where('wedding_id', $idWedding)->first();
       if (!$wedding) {
-         return "Wedding not found";
+         return 'Wedding not found';
       }
 
       $wedding->users()->updateExistingPivot($id_user, ['role_id' => 3, 'bus' => $data['bus'], 'prewedding' => $data['prewedding']]);
@@ -80,19 +68,21 @@ class GuestApiController extends Controller
          $wedding['numGuests'] = $wedding['numGuests'] + 1;
          $wedding->save();
       }
-      if (isset($data['infoMenu'])) $wedding->users()->updateExistingPivot($user->id, ['infoMenu' => $data['infoMenu']]);
-      if (isset($data['suggestion'])) $wedding->users()->updateExistingPivot($user->id, ['suggestion' => $data['suggestion']]);
-      if (isset($data['group'])) $wedding->users()->updateExistingPivot($user->id, ['group' => reFormatGroup($data['group'], $wedding->spouse1, $wedding->spouse2)]);
+      if (isset($data['infoMenu'])) {
+         $wedding->users()->updateExistingPivot($id_user, ['infoMenu' => $data['infoMenu']]);
+      }
+      if (isset($data['suggestion'])) {
+         $wedding->users()->updateExistingPivot($id_user, ['suggestion' => $data['suggestion']]);
+      }
+      if (isset($data['group'])) {
+         $wedding->users()->updateExistingPivot($id_user, ['group' => reFormatGroup($data['group'], $wedding->spouse1, $wedding->spouse2)]);
+      }
 
       return $wedding->users()->where('user_id', $id_user)->get();
    }
 
    /**
     * Cancel invite
-    *
-    * @param Request $request
-    * @param int $idWedding
-    * @return array|string
     */
    public function cancelInvite(Request $request, int $idWedding)
    {
@@ -100,7 +90,7 @@ class GuestApiController extends Controller
 
       $wedding = $user->weddings()->with('users')->withPivot('role_id', 'plusOne')->where('wedding_id', $idWedding)->first();
       if (!$wedding) {
-         return "Wedding not found";
+         return 'Wedding not found';
       }
 
       $wedding->users()->updateExistingPivot($user->id, ['role_id' => 4, 'bus' => 0, 'prewedding' => 0, 'group' => null, 'infoMenu' => null, 'suggestion' => null]);
@@ -116,50 +106,42 @@ class GuestApiController extends Controller
 
    /**
     * Calculate total of guests in the fields abilidated (bus, prewedding, confirmed)
-    *
-    * @param string $id wedding id
-    * @param Request $request
-    * @return array|string
     */
-   public function dataGuests(string $id, Request $request)
+   public function dataGuests(string $idWedding, Request $request)
    {
-      $wedding = Wedding::with('users', 'buses', 'prewedding')->findOrFail($id);
+      $wedding = Wedding::with('users', 'buses', 'prewedding')->findOrFail($idWedding);
       if (!$wedding) {
-         return "Wedding not found";
+         return 'Wedding not found';
       }
 
       $totalConfirmed = $wedding->users()->withPivot('role_id')->where('role_id', 3)->count();
       $totalConfirmed += $wedding->users()->withPivot('role_id')->where('role_id', 3)->where('plusOne', '!=', null)->count();
+
       if ($wedding->bus) {
          $totalBus = $wedding->users()->withPivot('bus')->where('bus', 1)->count();
          $totalBus += $wedding->users()->withPivot('bus')->where('bus', 1)->where('plusOne', '!=', null)->count();
-      } else {
-         $totalBus = 'none';
       }
-      if ($wedding->bus){
+
+      if ($wedding->bus) {
          $totalPrewedding = $wedding->users()->withPivot('prewedding')->where('prewedding', 1)->count();
          $totalPrewedding += $wedding->users()->withPivot('prewedding')->where('prewedding', 1)->where('plusOne', '!=', null)->count();
       }
-      return ['confirmed' => $totalConfirmed, 'bus' => $totalBus, 'prewedding' => $totalPrewedding];
+      return ['confirmed' => $totalConfirmed, 'bus' => $totalBus ?? 'none', 'prewedding' => $totalPrewedding ?? 'none'];
    }
 
    /**
     * Get guest groups by wedding
-    *
-    * @param Request $request
-    * @param string $id weddind id
-    * @return array|string
     */
-   public function guestGroups(Request $request, string $id)
+   public function guestGroups(Request $request, string $idWedding)
    {
-      $wedding = Wedding::findOrFail($id);
+      $wedding = Wedding::findOrFail($idWedding);
       if (!$wedding) {
-         return "Wedding not found";
+         return 'Wedding not found';
       }
 
       $type = DB::select('SHOW COLUMNS FROM user_wedding WHERE Field = "group"')[0]->Type;
-      $type = str_replace(["enum('", ')'], "", $type);
-      $values = array();
+      $type = str_replace(['enum(\'', ')'], '', $type);
+      $values = [];
       foreach (explode(',', $type) as $value) {
          $value = trim($value, "'");
          $value = formatGroup($value, $wedding->spouse1, $wedding->spouse2);
@@ -170,11 +152,6 @@ class GuestApiController extends Controller
 
    /**
     * Update guest group in wedding
-    *
-    * @param Request $request
-    * @param string $idWedding
-    * @param string $idGuest
-    * @return array|string
     */
    public function updateGroup(Request $request, string $idWedding, string $idGuest)
    {
@@ -183,18 +160,18 @@ class GuestApiController extends Controller
 
       $wedding = Wedding::with('users')->findOrFail($idWedding);
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         return ["Error" => "No tienes permisos para modificar esta boda"];
+         return ['error' => 'No tienes permisos para modificar esta boda'];
       }
 
       $guest = $wedding->users()->where('user_id', $idGuest)->first();
       if (!$guest) {
-         return "Guest not found";
+         return 'Guest not found';
       }
 
       $data = $request->all();
-      if ($data['group'] === null) {
-         $group = null;
-      } else {
+
+      $group = null;
+      if ($data['group'] !== null) {
          $group = reFormatGroup($data['group'], $wedding->spouse1, $wedding->spouse2);
       }
       $wedding->users()->updateExistingPivot($idGuest, ['group' => $group]);
@@ -206,10 +183,6 @@ class GuestApiController extends Controller
 
    /**
     * Remove guests from wedding
-    *
-    * @param DeteleGuestsRequest $request
-    * @param string $idWedding
-    * @return array
     */
    public function delete(DeteleGuestsRequest $request, string $idWedding)
    {
@@ -220,7 +193,7 @@ class GuestApiController extends Controller
       $wedding = Wedding::with('users', 'tables.users', 'infos')->findOrFail($idWedding);
 
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         return ["Error" => "No tienes permisos para modificar esta boda"];
+         return ['error' => 'No tienes permisos para modificar esta boda'];
       }
 
       $countTable = 0;
