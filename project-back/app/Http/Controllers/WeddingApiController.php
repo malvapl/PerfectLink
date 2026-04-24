@@ -53,14 +53,6 @@ class WeddingApiController extends Controller
     */
    public function index(Request $request)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ["Error" => "Usuario no logeado"];
-      }
       // $weddings = Wedding::with('users');
       $weddings = Wedding::all();
       return new ResourceCollection(WeddingGeneralResource::collection($weddings));
@@ -87,14 +79,8 @@ class WeddingApiController extends Controller
     */
    public function getInfo(string $id, Request $request)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ["Error" => "Usuario no logeado"];
-      }
+      $user = $request->user();
+      $id_user = $user->id;
 
       $wedding = Wedding::with('users', 'tables.users', 'infos')->findOrFail($id);
 
@@ -113,14 +99,8 @@ class WeddingApiController extends Controller
     */
    public function store(CreateWeddingRequest $request)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ["error" => "Usuario no logeado"];
-      }
+      $user = $request->user();
+      $id_user = $user->id;
 
       if ($user->hasOwnWedding() !== 0) {
          return ["error" => "Ya estás organizando una boda"];
@@ -172,14 +152,6 @@ class WeddingApiController extends Controller
     */
    public function getBuses(string $idWedding, Request $request)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ["Error" => "Usuario no logeado"];
-      }
       $wedding = Wedding::with('users', 'tables.users', 'infos')->findOrFail($idWedding);
       if (!$wedding) {
          return ['error' => 'wedding not found'];
@@ -203,14 +175,6 @@ class WeddingApiController extends Controller
     */
    public function getPrewedding(string $idWedding, Request $request)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ["Error" => "Usuario no logeado"];
-      }
       $wedding = Wedding::with('users', 'tables.users', 'infos')->findOrFail($idWedding);
       if (!$wedding) {
          return ['error' => 'wedding not found'];
@@ -231,14 +195,9 @@ class WeddingApiController extends Controller
     */
    public function update(WeddingUpdateRequest $request, string $idWedding)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ['error' => 'user not logged'];
-      }
+      $user = $request->user();
+      $id_user = $user->id;
+
       $wedding = $user->weddings()->withPivot('role_id')->where('wedding_id', $idWedding)->first();
 
       if (!$wedding) {
@@ -271,14 +230,8 @@ class WeddingApiController extends Controller
     */
    public function updateBus(CreateBusWeddingRequest $request, string $idWedding)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ['error' => 'user not logged'];
-      }
+      $user = $request->user();
+      $id_user = $user->id;
 
       $wedding = Wedding::with('buses')->find($idWedding);
 
@@ -315,14 +268,8 @@ class WeddingApiController extends Controller
     */
    public function addBus(CreateBusWeddingRequest $request, string $idWedding)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ['error' => 'user not logged'];
-      }
+      $user = $request->user();
+      $id_user = $user->id;
 
       $wedding = Wedding::with('buses')->find($idWedding);
 
@@ -347,14 +294,8 @@ class WeddingApiController extends Controller
     */
    public function updatePrewedding(UpdatePreweddingRequest $request, string $idWedding)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ['error' => 'user not logged'];
-      }
+      $user = $request->user();
+      $id_user = $user->id;
 
       $wedding = Wedding::with('prewedding')->find($idWedding);
 
@@ -381,14 +322,8 @@ class WeddingApiController extends Controller
     */
    public function cancelPrewedding(Request $request, string $idWedding)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ['error' => 'user not logged'];
-      }
+      $user = $request->user();
+      $id_user = $user->id;
 
       $wedding = Wedding::find($idWedding);
 
@@ -414,14 +349,8 @@ class WeddingApiController extends Controller
     */
    public function cancelBuses(Request $request, string $idWedding)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ['error' => 'user not logged'];
-      }
+      $user = $request->user();
+      $id_user = $user->id;
 
       $wedding = Wedding::find($idWedding);
 
@@ -449,14 +378,8 @@ class WeddingApiController extends Controller
     */
    public function addInfoCards(CreateInfoWeddingRequest $request, string $idWedding)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ['error' => 'user not logged'];
-      }
+      $user = $request->user();
+      $id_user = $user->id;
 
       $wedding = Wedding::with('infos')->find($idWedding);
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
@@ -495,14 +418,8 @@ class WeddingApiController extends Controller
     */
    public function addInfoCard(CreateInfoWeddingRequest $request, string $idWedding)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ['error' => 'user not logged'];
-      }
+      $user = $request->user();
+      $id_user = $user->id;
 
       $wedding = Wedding::with('infos')->find($idWedding);
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
@@ -526,14 +443,8 @@ class WeddingApiController extends Controller
     */
    public function destroy(Request $request, string $idWedding)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ['error' => 'user not logged'];
-      }
+      $user = $request->user();
+      $id_user = $user->id;
 
       $wedding = Wedding::find($idWedding);
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {

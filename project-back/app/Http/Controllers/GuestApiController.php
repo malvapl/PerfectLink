@@ -65,13 +65,8 @@ class GuestApiController extends Controller
     */
    public function confirmInvite(ConfirmationRequest $request, int $idWedding)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-      } else {
-         return ['error' => 'user not logged'];
-      }
+      $user = $request->user();
+      $id_user = $user->id;
 
       $data = $request->all();
       $wedding = $user->weddings()->with('users')->withPivot('role_id')->where('wedding_id', $idWedding)->first();
@@ -79,9 +74,9 @@ class GuestApiController extends Controller
          return "Wedding not found";
       }
 
-      $wedding->users()->updateExistingPivot($user->id, ['role_id' => 3, 'bus' => $data['bus'], 'prewedding' => $data['prewedding']]);
+      $wedding->users()->updateExistingPivot($id_user, ['role_id' => 3, 'bus' => $data['bus'], 'prewedding' => $data['prewedding']]);
       if (isset($data['plusOne'])) {
-         $wedding->users()->updateExistingPivot($user->id, ['plusOne' => $data['plusOne']]);
+         $wedding->users()->updateExistingPivot($id_user, ['plusOne' => $data['plusOne']]);
          $wedding['numGuests'] = $wedding['numGuests'] + 1;
          $wedding->save();
       }
@@ -89,7 +84,7 @@ class GuestApiController extends Controller
       if (isset($data['suggestion'])) $wedding->users()->updateExistingPivot($user->id, ['suggestion' => $data['suggestion']]);
       if (isset($data['group'])) $wedding->users()->updateExistingPivot($user->id, ['group' => reFormatGroup($data['group'], $wedding->spouse1, $wedding->spouse2)]);
 
-      return $wedding->users()->where('user_id', $user->id)->get();
+      return $wedding->users()->where('user_id', $id_user)->get();
    }
 
    /**
@@ -101,13 +96,7 @@ class GuestApiController extends Controller
     */
    public function cancelInvite(Request $request, int $idWedding)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-      } else {
-         return ['error' => 'user not logged'];
-      }
+      $user = $request->user();
 
       $wedding = $user->weddings()->with('users')->withPivot('role_id', 'plusOne')->where('wedding_id', $idWedding)->first();
       if (!$wedding) {
@@ -134,15 +123,6 @@ class GuestApiController extends Controller
     */
    public function dataGuests(string $id, Request $request)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ["Error" => "Usuario no logeado"];
-      }
-
       $wedding = Wedding::with('users', 'buses', 'prewedding')->findOrFail($id);
       if (!$wedding) {
          return "Wedding not found";
@@ -172,14 +152,6 @@ class GuestApiController extends Controller
     */
    public function guestGroups(Request $request, string $id)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-      } else {
-         return ["Error" => "Usuario no logeado"];
-      }
-
       $wedding = Wedding::findOrFail($id);
       if (!$wedding) {
          return "Wedding not found";
@@ -206,14 +178,8 @@ class GuestApiController extends Controller
     */
    public function updateGroup(Request $request, string $idWedding, string $idGuest)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ["Error" => "Usuario no logeado"];
-      }
+      $user = $request->user();
+      $id_user = $user->id;
 
       $wedding = Wedding::with('users')->findOrFail($idWedding);
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
@@ -247,14 +213,8 @@ class GuestApiController extends Controller
     */
    public function delete(DeteleGuestsRequest $request, string $idWedding)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ["Error" => "Usuario no logeado"];
-      }
+      $user = $request->user();
+      $id_user = $user->id;
 
       $ids = $request->all()['ids'];
       $wedding = Wedding::with('users', 'tables.users', 'infos')->findOrFail($idWedding);

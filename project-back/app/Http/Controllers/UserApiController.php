@@ -83,14 +83,8 @@ class UserApiController extends Controller
     */
    public function joinWedding(Request $request, string $code)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ["error" => "Usuario no logeado"];
-      }
+      $user = $request->user();
+
       if ($user->is_admin) {
          return ["error" => "Los administradores no pueden ser invitados"];
       }
@@ -132,13 +126,7 @@ class UserApiController extends Controller
     */
    public function roleWedding(Request $request, int $idWedding)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-      } else {
-         return ['error' => 'user not logged'];
-      }
+      $user = $request->user();
 
       $isAdmin = $user->is_admin;
       $wedding = $user->weddings()->withPivot('role_id')->where('wedding_id', $idWedding)->first();
@@ -157,13 +145,7 @@ class UserApiController extends Controller
     */
    public function weddings(Request $request)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-      } else {
-         return ['error' => 'user not logged'];
-      }
+      $user = $request->user();
 
       $weddings = $user->weddings()->withPivot('role_id')
          ->whereIn('role_id', [2, 3])->get();
@@ -197,17 +179,10 @@ class UserApiController extends Controller
    /**
     * Check if user is admin
     *
-    * @param Request $request
+    * @return bool
     */
    public function isAdmin(Request $request)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-      } else {
-         return ['error' => 'user not logged'];
-      }
-      return $user->is_admin;
+      return $request->user()->is_admin;
    }
 }

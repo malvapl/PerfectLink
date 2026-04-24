@@ -38,15 +38,6 @@ class TableApiController extends Controller
     */
    public function updateTable(UpdateTableRequest $request, Table $table)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-         $id_user = $user->id;
-      } else {
-         return ["Error" => "Usuario no logeado"];
-      }
-
       $data = $request->all();
       $table->update($data);
 
@@ -84,15 +75,7 @@ class TableApiController extends Controller
     */
    public function destroyTable(Request $request, Wedding $wedding, string $id)
    {
-      if ($request->bearerToken() !== null) {
-         $token = $request->bearerToken();
-         $personalAccessToken = PersonalAccessToken::findToken($token);
-         $user = $personalAccessToken->tokenable;
-      } else {
-         return ["Error" => "Usuario no logeado"];
-      }
-
-      $wedding->tables()->find($id)->delete();
+      $wedding->tables()->find($id)->delete(); // TODO control fail
       return ['response' => 'success'];
    }
 }
