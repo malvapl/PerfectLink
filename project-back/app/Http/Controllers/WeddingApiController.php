@@ -190,20 +190,20 @@ class WeddingApiController extends Controller
 
       if ($data['deleted']) {
          $bus = Bus::find($data['id']);
-         $bus->delete();
-      } else if (isset($data['id'])) {
+         return ['success' => (bool) $bus->delete(), 'message' => 'Bus deleted'];
+      }
+
+      if (isset($data['id'])) {
          $bus = Bus::find($data['id']);
          $bus->departure = $data['departure'];
          $bus->direction = $data['direction'];
          $bus->start = $data['start'];
          $bus->end = $data['end'];
-         $bus->save();
-      } else {
-         $data['wedding_id'] = $idWedding;
-         $bus = Bus::create($data);
+         return ['success' => (bool) $bus->save(), 'message' => 'Bus updated'];
       }
 
-      return new ResourceCollection(BusResource::collection($wedding->buses()->get()));
+      $data['wedding_id'] = $idWedding;
+      return ['success' => (bool) Bus::create($data), 'message' => 'Bus created'];
    }
 
    public function addBus(CreateBusWeddingRequest $request, string $idWedding)
