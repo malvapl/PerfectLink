@@ -18,7 +18,6 @@ use App\Models\Wedding;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Str;
-use Laravel\Sanctum\PersonalAccessToken;
 use App\Http\Requests\UpdatePreweddingRequest;
 use App\Http\Resources\PreweddingResource;
 use Illuminate\Support\Facades\Storage;

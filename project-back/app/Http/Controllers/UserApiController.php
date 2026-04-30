@@ -69,10 +69,6 @@ class UserApiController extends Controller
 
    /**
     * Check if user is assignable to the wedding and link them
-    * 
-    * @param Request $request
-    * @param string $code wedding code
-    * @return array|WeddingGeneralResource
     */
    public function joinWedding(Request $request, string $code)
    {
@@ -111,10 +107,6 @@ class UserApiController extends Controller
 
    /**
     * Get user role in specific wedding
-    *
-    * @param Request $request
-    * @param int $idWedding
-    * @return array
     */
    public function roleWedding(Request $request, int $idWedding)
    {

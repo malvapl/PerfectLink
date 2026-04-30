@@ -11,7 +11,6 @@ use App\Models\Wedding;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\DB;
-use Laravel\Sanctum\PersonalAccessToken;
 
 class GuestApiController extends Controller
 {
@@ -133,6 +132,7 @@ class GuestApiController extends Controller
       $type = DB::select('SHOW COLUMNS FROM user_wedding WHERE Field = "group"')[0]->Type;
       $type = str_replace(['enum(\'', ')'], '', $type);
       $values = [];
+
       foreach (explode(',', $type) as $value) {
          $value = trim($value, "'");
          $value = formatGroup($value, $wedding->spouse1, $wedding->spouse2);
@@ -168,6 +168,7 @@ class GuestApiController extends Controller
 
       $guest = $wedding->users()->withPivot('role_id', 'created_at', 'plusOne', 'infoMenu', 'suggestion', 'group')
          ->where('user_id', $idGuest)->first();
+
       return GuestResource::customResource($guest, $wedding->spouse1, $wedding->spouse2);
    }
 
