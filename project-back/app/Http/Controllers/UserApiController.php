@@ -127,16 +127,17 @@ class UserApiController extends Controller
    {
       $user = $request->user();
 
-      $isAdmin = $user->is_admin;
-      $wedding = $user->weddings()->withPivot('role_id')->where('wedding_id', $idWedding)->first();
-      if (!$wedding) {
-         return ['response' => 'none', 'admin' => $isAdmin];
+      if ($user->is_admin) {
+         return ['data' => 'admin'];
       }
+
+      $wedding = $user->weddings()->withPivot('role_id')->where('wedding_id', $idWedding)->first();
+      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
 
       $role_id = $wedding->pivot->role_id;
       $role = DB::table('roles')->where('id', $role_id)->value('name');
 
-      return ['response' => $role, 'admin' => $isAdmin];
+      return ['data' => $role];
    }
 
    /**
