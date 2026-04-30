@@ -58,9 +58,7 @@ class GuestApiController extends Controller
 
       $data = $request->all();
       $wedding = $user->weddings()->with('users')->withPivot('role_id')->where('wedding_id', $idWedding)->first();
-      if (!$wedding) {
-         return 'Wedding not found';
-      }
+      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
 
       $wedding->users()->updateExistingPivot($id_user, ['role_id' => 3, 'bus' => $data['bus'], 'prewedding' => $data['prewedding']]);
       if (isset($data['plusOne'])) {
@@ -89,9 +87,7 @@ class GuestApiController extends Controller
       $user = $request->user();
 
       $wedding = $user->weddings()->with('users')->withPivot('role_id', 'plusOne')->where('wedding_id', $idWedding)->first();
-      if (!$wedding) {
-         return 'Wedding not found';
-      }
+      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
 
       $wedding->users()->updateExistingPivot($user->id, ['role_id' => 4, 'bus' => 0, 'prewedding' => 0, 'group' => null, 'infoMenu' => null, 'suggestion' => null]);
       if ($wedding->pivot->plusOne !== null) {
@@ -110,9 +106,7 @@ class GuestApiController extends Controller
    public function dataGuests(string $idWedding, Request $request)
    {
       $wedding = Wedding::with('users', 'buses', 'prewedding')->findOrFail($idWedding);
-      if (!$wedding) {
-         return 'Wedding not found';
-      }
+      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
 
       $totalConfirmed = $wedding->users()->withPivot('role_id')->where('role_id', 3)->count();
       $totalConfirmed += $wedding->users()->withPivot('role_id')->where('role_id', 3)->where('plusOne', '!=', null)->count();
@@ -135,9 +129,7 @@ class GuestApiController extends Controller
    public function guestGroups(Request $request, string $idWedding)
    {
       $wedding = Wedding::findOrFail($idWedding);
-      if (!$wedding) {
-         return 'Wedding not found';
-      }
+      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
 
       $type = DB::select('SHOW COLUMNS FROM user_wedding WHERE Field = "group"')[0]->Type;
       $type = str_replace(['enum(\'', ')'], '', $type);
@@ -160,13 +152,11 @@ class GuestApiController extends Controller
 
       $wedding = Wedding::with('users')->findOrFail($idWedding);
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         return ['error' => 'No tienes permisos para modificar esta boda'];
+         abort(response()->json(['message' => 'No tienes permisos para ver esta boda'], 400));
       }
 
       $guest = $wedding->users()->where('user_id', $idGuest)->first();
-      if (!$guest) {
-         return 'Guest not found';
-      }
+      abort_if(!$guest, response()->json(['message' => 'Guest not found'], 404));
 
       $data = $request->all();
 
@@ -193,7 +183,7 @@ class GuestApiController extends Controller
       $wedding = Wedding::with('users', 'tables.users', 'infos')->findOrFail($idWedding);
 
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         return ['error' => 'No tienes permisos para modificar esta boda'];
+         abort(response()->json(['message' => 'No tienes permisos para ver esta boda'], 400));
       }
 
       $countTable = 0;

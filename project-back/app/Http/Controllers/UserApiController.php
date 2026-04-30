@@ -85,27 +85,24 @@ class UserApiController extends Controller
    {
       $user = $request->user();
 
-      if ($user->is_admin) {
-         return ['error' => 'Un administrador no puede participar en una boda'];
-      }
+      abort_if($user->is_admin, response()->json(['message' => 'Un administrador no puede participar en una boda'], 400));
 
       $wedding = Wedding::where('codeGuest', $code)->first();
       if (!$wedding) {
          $wedding = Wedding::where('codeOrg', $code)->first();
-         if (!$wedding) {
-            return ['error' => 'Wedding not found'];
-         }
+         abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
+
          if ($user->weddings()->withPivot('role_id')->where('role_id', 1)->count() !== 0) {
-            return ['error' => 'Ya estás organizando una boda'];
+            abort(response()->json(['message' => 'Ya estás organizando una boda'], 400));
          }
          if ($user->weddings()->withPivot('role_id')->whereIn('role_id', [2, 3])->pluck('wedding_id')->first() === $wedding->id) {
-            return ['error' => 'Ya eres invitado de esta boda'];
+            abort(response()->json(['message' => 'Ya eres invitado de esta boda'], 400));
          }
 
          $role = 1;
       } else {
          if ($user->weddings()->withPivot('role_id')->where('role_id', 1)->pluck('wedding_id')->first() === $wedding->id) {
-            return ['error' => 'No puedes ser invitado de tu propia boda'];
+            abort(response()->json(['message' => 'No puedes ser invitado de tu propia boda'], 400));
          }
 
          $role = 2;
@@ -159,6 +156,7 @@ class UserApiController extends Controller
    public function existsCodeGuest(string $code)
    {
       $wedding = Wedding::where('codeGuest', $code)->first();
+      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
 
       return !$wedding ? ['error' => 'not found'] : ['id' => $wedding->id];
    }
@@ -169,6 +167,7 @@ class UserApiController extends Controller
    public function existsCodeOrg(string $code)
    {
       $wedding = Wedding::where('codeOrg', $code)->first();
+      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
 
       return !$wedding ? ['error' => 'not found'] : ['id' => $wedding->id];
    }

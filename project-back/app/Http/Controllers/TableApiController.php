@@ -43,9 +43,7 @@ class TableApiController extends Controller
 
          foreach ($data['guests'] as $guest) {
             $user = User::find($guest['id']);
-            if (!$user) {
-               return response()->json(['error' => 'Usuario no encontrado'], 404);
-            }
+            abort_if(!$user, response()->json(['message' => 'User not found'], 404));
 
             $table->users()->attach($user->id, ['plusOne' => str_contains($guest['name'], '(+1)'), 'numSeat' => $guest['numSeat']]);
          }

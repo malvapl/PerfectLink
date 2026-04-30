@@ -75,7 +75,7 @@ class WeddingApiController extends Controller
       $wedding = Wedding::with('users', 'tables.users', 'infos')->findOrFail($idWedding);
 
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         return ['error' => 'No tienes permisos para ver esta boda'];
+         abort(response()->json(['message' => 'No tienes permisos para ver esta boda'], 400));
       }
 
       return new ResourceCollection(InfoResource::collection($wedding->infos()->get()));
@@ -89,9 +89,7 @@ class WeddingApiController extends Controller
       $user = $request->user();
       $id_user = $user->id;
 
-      if ($user->hasOwnWedding() !== 0) {
-         return ['error' => 'Ya estás organizando una boda'];
-      }
+      abort_if($user->hasOwnWedding() !== 0, response()->json(['message' => 'Ya estás organizando una boda'], 400));
 
       $data = $request->all();
       do {
@@ -133,13 +131,8 @@ class WeddingApiController extends Controller
    public function getBuses(string $idWedding, Request $request)
    {
       $wedding = Wedding::with('users', 'tables.users', 'infos')->findOrFail($idWedding);
-      if (!$wedding) {
-         return ['error' => 'wedding not found'];
-      }
-
-      if (!$wedding->bus) {
-         return ['data' => 'none'];
-      }
+      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
+      abort_if(!$wedding->bus, response()->json(['message' => 'Buses not found'], 404));
 
       $buses = Bus::where('wedding_id', $idWedding)->get();
 
@@ -149,13 +142,11 @@ class WeddingApiController extends Controller
    public function getPrewedding(string $idWedding, Request $request)
    {
       $wedding = Wedding::with('users', 'tables.users', 'infos')->findOrFail($idWedding);
-      if (!$wedding) {
-         return ['error' => 'wedding not found'];
-      }
+      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
 
       $pw = Prewedding::where('wedding_id', $idWedding)->first();
-      if (!$pw)
-         return ['data' => 'none'];
+      abort_if(!$pw, response()->json(['message' => 'Prewedding not found'], 404));
+
       return new PreweddingResource($pw);
    }
 
@@ -165,13 +156,10 @@ class WeddingApiController extends Controller
       $id_user = $user->id;
 
       $wedding = $user->weddings()->withPivot('role_id')->where('wedding_id', $idWedding)->first();
-
-      if (!$wedding) {
-         return ['error' => 'wedding not found'];
-      }
+      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
 
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         return ['error' => 'No tienes permisos para modificar esta boda'];
+         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400)); // TODO handle with policies
       }
 
       $data = $request->all();
@@ -195,7 +183,7 @@ class WeddingApiController extends Controller
       $wedding = Wedding::with('buses')->find($idWedding);
 
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         return ['error' => 'No tienes permisos para modificar esta boda'];
+         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400));
       }
 
       $data = $request->all();
@@ -226,7 +214,7 @@ class WeddingApiController extends Controller
       $wedding = Wedding::with('buses')->find($idWedding);
 
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         return ['error' => 'No tienes permisos para modificar esta boda'];
+         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400));
       }
 
       $data = $request->all();
@@ -245,7 +233,7 @@ class WeddingApiController extends Controller
       $wedding = Wedding::with('prewedding')->find($idWedding);
 
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         return ['error' => 'No tienes permisos para modificar esta boda'];
+         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400));
       }
 
       $data = $request->all();
@@ -266,7 +254,7 @@ class WeddingApiController extends Controller
       $wedding = Wedding::find($idWedding);
 
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         return ['error' => 'No tienes permisos para modificar esta boda'];
+         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400));
       }
 
       $wedding['prewedding'] = false;
@@ -289,7 +277,7 @@ class WeddingApiController extends Controller
       $wedding = Wedding::find($idWedding);
 
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         return ['error' => 'No tienes permisos para modificar esta boda'];
+         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400));
       }
 
       $wedding['bus'] = false;
@@ -313,7 +301,7 @@ class WeddingApiController extends Controller
 
       $wedding = Wedding::with('infos')->find($idWedding);
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         return ['error' => 'No tienes permisos para modificar esta boda'];
+         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400));
       }
 
       $data = $request->all();
@@ -346,7 +334,7 @@ class WeddingApiController extends Controller
 
       $wedding = Wedding::with('infos')->find($idWedding);
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         return ['error' => 'No tienes permisos para modificar esta boda'];
+         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400));
       }
 
       $data = $request->all();
@@ -364,7 +352,7 @@ class WeddingApiController extends Controller
 
       $wedding = Wedding::find($idWedding);
       if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         return ['error' => 'No tienes permisos para modificar esta boda'];
+         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400));
       }
 
       $wedding->delete();
