@@ -1,8 +1,8 @@
-import Table from "./Table"
-import { Stage, Layer, Rect, Circle } from "react-konva";
-import { useEffect, useRef, useState } from "react";
-import Konva from "konva";
-import { IPopoverSeat } from "./AppTables";
+import Table from './Table';
+import { Stage, Layer, Rect, Circle } from 'react-konva';
+import { useEffect, useRef, useState } from 'react';
+import Konva from 'konva';
+import { IPopoverSeat } from './AppTables';
 
 export interface ITable {
    id: number;

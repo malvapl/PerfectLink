@@ -58,7 +58,7 @@ interface HeadCell {
    disablePadding: boolean;
    id: keyof Guest;
    label: string;
-   align: "center" | "left" | "right" | "inherit" | "justify" | undefined;
+   align: 'center' | 'left' | 'right' | 'inherit' | 'justify' | undefined;
    hidden: boolean;
    sortable: boolean;
 }

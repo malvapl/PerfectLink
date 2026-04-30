@@ -5,7 +5,7 @@ import Toolbar from '@mui/material/Toolbar';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import Button from '@mui/material/Button';
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from 'react-router-dom';
 import theme from '../theme/theme';
 import { Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -24,7 +24,6 @@ const pages = [
 const settingsAuth = [
    { name: 'Cerrar sesión', route: '/logout' }
 ];
-
 
 const settingsNoAuth = [
    { name: 'Iniciar sesión', route: '/login' },
@@ -63,31 +62,27 @@ function Header() {
       window.addEventListener('storage', () => {
          setAdmin(false)
          setAuth(localStorage.getItem('token') !== null || false)
-         const value = localStorage.getItem("token")
+         const value = localStorage.getItem('token')
          if (typeof value === 'string') {
             setToken(JSON.parse(value))
          }
          getWeddings(requestOptions)
          checkAdmin(requestOptions)
-         setIdWedding(parseInt(localStorage.getItem("hasOwnWedding") || '') || 0)
+         setIdWedding(parseInt(localStorage.getItem('hasOwnWedding') || '') || 0)
       })
-      const value = localStorage.getItem("token")
+      const value = localStorage.getItem('token')
       if (typeof value === 'string') {
          setToken(JSON.parse(value))
       }
       checkAdmin(requestOptions)
       getWeddings(requestOptions)
-      setIdWedding(parseInt(localStorage.getItem("hasOwnWedding") || '') || 0)
+      setIdWedding(parseInt(localStorage.getItem('hasOwnWedding') || '') || 0)
 
    }, [token])
 
    useEffect(() => {
       setSettings(auth ? settingsAuth : settingsNoAuth)
    }, [auth])
-   useEffect(() => {
-      console.log('ADMIN', admin)
-   }, [admin])
-
 
    const getWeddings = async (requestOptions: RequestInit) => {
       fetch(`${import.meta.env.VITE_HOST}users/weddings`, requestOptions)
@@ -96,7 +91,7 @@ function Header() {
             setWeddingsUser(result.data);
          })
          .catch((error) => {
-            console.log(error)
+            console.error(error)
          })
    }
 
@@ -108,7 +103,7 @@ function Header() {
          })
          .catch((error) => {
             setAdmin(false)
-            console.log(error)
+            console.error(error)
          })
    }
 

@@ -1,4 +1,4 @@
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, Snackbar } from '@mui/material';
 
 const Message = (props: {
     showAlert: boolean, color: (

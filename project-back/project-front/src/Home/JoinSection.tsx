@@ -17,12 +17,11 @@ const JoinSection = (props: {
    const [btnDisabled, setBtnDisabled] = useState(true);
    const [showAlert, setShowAlert] = useState(false)
    const [showAlertSuccess, setShowAlertSuccess] = useState(false);
-   const [alertVariant, setAlertVariant] = useState<"error" | "info" | "success" | "warning">("info");
-   const [alertMessage, setAlertMessage] = useState("");
+   const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
+   const [alertMessage, setAlertMessage] = useState('');
    const [loading, setLoading] = useState(false)
 
    const joinUser = async (code: string, id: string) => {
-      console.log("ASD")
       const token = JSON.parse(localStorage.getItem("token") || '');
 
       const myHeaders = new Headers();
@@ -38,26 +37,26 @@ const JoinSection = (props: {
       fetch(`${import.meta.env.VITE_HOST}users/joinWedding/${code}`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
+            console.log(result)
             if (result.error) {
                setLoading(false);
                setAlertMessage(result.error);
-               setAlertVariant("error");
+               setAlertVariant('error');
                setShowAlertSuccess(true)
             } else {
-               window.dispatchEvent(new StorageEvent("storage"));
+               window.dispatchEvent(new StorageEvent('storage'));
                setTimeout(() => {
-                  navigate("/wedding/" + id);
+                  navigate('/wedding/' + id);
                }, 3000);
-               setAlertMessage("Uniéndose a la boda...");
-               setAlertVariant("success");
+               setAlertMessage('Uniéndose a la boda...');
+               setAlertVariant('success');
                setShowAlertSuccess(true);
             }
          })
          .catch((error) => {
-            console.log(error)
             setLoading(false);
             setAlertMessage('Error');
-            setAlertVariant("error");
+            setAlertVariant('error');
             setShowAlertSuccess(true)
          })
    };

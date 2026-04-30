@@ -1,5 +1,5 @@
-import { Paper, TextField } from "@mui/material";
-import { OptionCardData } from "./CustomInfo"
+import { Paper, TextField } from '@mui/material';
+import { OptionCardData } from './CustomInfo';
 
 const InfoCard = (props: {
    data: OptionCardData,

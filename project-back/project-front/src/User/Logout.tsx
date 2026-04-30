@@ -1,9 +1,9 @@
-import { Container, Paper } from "@mui/material";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom"
+import { Container, Paper } from '@mui/material';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
-import { Spinner } from "react-bootstrap";
-import theme from "../theme/theme";
+import { Spinner } from 'react-bootstrap';
+import theme from '../theme/theme';
 
 
 const Logout = () => {
@@ -11,11 +11,11 @@ const Logout = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("hasOwnWedding");
-    window.dispatchEvent(new Event("storage"));
+    localStorage.removeItem('token');
+    localStorage.removeItem('hasOwnWedding');
+    window.dispatchEvent(new Event('storage'));
     setTimeout(() => {
-      navigate("/");
+      navigate('/');
     }, 3000);
   }, [navigate])
 

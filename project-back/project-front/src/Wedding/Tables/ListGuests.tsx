@@ -1,8 +1,8 @@
-import { Divider, Drawer, IconButton, List, ListItem, ListItemText, Tooltip, Typography } from "@mui/material"
+import { Divider, Drawer, IconButton, List, ListItem, ListItemText, Tooltip, Typography } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { IGuest } from "./SpaceTables";
-import { useEffect, useState } from "react";
-import theme from "../../theme/theme";
+import { IGuest } from './SpaceTables';
+import { useEffect, useState } from 'react';
+import theme from '../../theme/theme';
 
 interface GroupedGuests {
    group: string;
@@ -19,7 +19,6 @@ const ListGuests = (props: {
    const [groupedGuests, setGroupedGuests] = useState<GroupedGuests[]>([])
 
    useEffect(() => {
-      console.log(props.guests)
       setGroupedGuests([])
       props.groups.map(group => {
          setGroupedGuests(gg => [...gg, {

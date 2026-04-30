@@ -1,8 +1,8 @@
 import { useForm, SubmitHandler, Controller } from 'react-hook-form'
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import { Button, Container, Grid, TextField, FormLabel, FormHelperText, RadioGroup, FormControlLabel, Radio, Switch, Stack } from '@mui/material';
-import { useEffect, useState } from "react";
-import SpinnerForm from "../SpinnerForm.tsx";
+import { useEffect, useState } from 'react';
+import SpinnerForm from '../SpinnerForm.tsx';
 import Message from '../Message.tsx';
 import GavelIcon from '@mui/icons-material/Gavel';
 import ChurchIcon from '@mui/icons-material/Church';
@@ -31,14 +31,14 @@ const CreateWedding = () => {
 
    const [loading, setLoading] = useState(false);
    const [showAlert, setShowAlert] = useState(false);
-   const [alertVariant, setAlertVariant] = useState<"error" | "info" | "success" | "warning">("info");
-   const [alertMessage, setAlertMessage] = useState("");
+   const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
+   const [alertMessage, setAlertMessage] = useState('');
    const [helperPrewedding, setHelperPrewedding] = useState(false)
    const [helperBus, setHelperBus] = useState(false)
 
    const { register, handleSubmit, control, formState: { errors, isDirty, isValid } }
       = useForm<FormValues>({
-         mode: "onBlur", defaultValues: {
+         mode: 'onBlur', defaultValues: {
             prewedding: 1,
             bus: 1,
             ceremony: true,
@@ -66,7 +66,6 @@ const CreateWedding = () => {
          startHour: dayjs(data.startHour).format('HH:mm'),
          date: dayjs(data.date).format('YYYY-MM-DD')
       });
-      console.log(raw)
 
       const requestOptions: RequestInit = {
          method: "POST",
@@ -89,17 +88,16 @@ const CreateWedding = () => {
                setAlertMessage("Creando sala de la boda...");
                setAlertVariant("success");
                setShowAlert(true);
-               localStorage.setItem("hasOwnWedding", JSON.stringify(result.id));
-               window.dispatchEvent(new Event("storage"));
+               localStorage.setItem('hasOwnWedding', JSON.stringify(result.id));
+               window.dispatchEvent(new Event('storage'));
                setTimeout(() => {
-                  navigate("/wedding/" + result.id);
+                  navigate('/wedding/' + result.id);
                }, 3000);
             }
          })
          .catch((error) => {
-            console.log(error)
-            setAlertMessage("No se ha podido crear la boda");
-            setAlertVariant("error");
+            setAlertMessage('No se ha podido crear la boda: ' + error);
+            setAlertVariant('error');
             setShowAlert(true)
             setLoading(false)
          })

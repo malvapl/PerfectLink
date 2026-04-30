@@ -1,8 +1,8 @@
 import { useForm, SubmitHandler, Controller } from 'react-hook-form'
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Container, Grid, TextField, FormLabel, FormHelperText, FormControlLabel, Checkbox, FormControl, Select, MenuItem } from '@mui/material';
-import { useEffect, useState } from "react";
-import SpinnerForm from "../SpinnerForm.tsx";
+import { useEffect, useState } from 'react';
+import SpinnerForm from '../SpinnerForm.tsx';
 import Message from '../Message.tsx';
 import { Spinner } from 'react-bootstrap';
 import { pickBy } from 'lodash';
@@ -25,8 +25,8 @@ const ConfirmationForm = () => {
    const [btnLoading, setBtnLoading] = useState(false);
    const [loading, setLoading] = useState(false);
    const [showAlert, setShowAlert] = useState(false);
-   const [alertVariant, setAlertVariant] = useState<"error" | "info" | "success" | "warning">("info");
-   const [alertMessage, setAlertMessage] = useState("");
+   const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
+   const [alertMessage, setAlertMessage] = useState('');
    const [checkPlusOne, setCheckPlusOne] = useState(false)
    const [helperPlusOne, setHelperPlusOne] = useState(false)
    const [btnDisabled, setBtnDisabled] = useState(false)
@@ -34,7 +34,7 @@ const ConfirmationForm = () => {
    const [errorPlusOne, setErrorPlusOne] = useState(false)
    const { register, handleSubmit, control, setValue }
       = useForm<FormValues>({
-         mode: "onBlur", defaultValues: {
+         mode: 'onBlur', defaultValues: {
             prewedding: false,
             bus: false,
             group: 'Sin asignar'
@@ -61,10 +61,12 @@ const ConfirmationForm = () => {
       fetch(`${import.meta.env.VITE_HOST}userRole/${id}`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
-            if (result.response !== 'guestPending') navigate('/')
+            if (result.data !== 'guestPending') {
+               navigate('/')
+            }
          })
          .catch((error) => {
-            console.log(error)
+            console.error(error)
          })
 
       fetch(`${import.meta.env.VITE_HOST}guestGroups/${id}`, requestOptions)
@@ -73,8 +75,8 @@ const ConfirmationForm = () => {
             setGroups(result)
             setLoading(false)
          })
-         .catch(() => {
-            console.log('error: boda no encontrada')
+         .catch((error) => {
+            console.error(error)
             setLoading(false)
          })
    }, [id, navigate, setGroups])
@@ -100,18 +102,16 @@ const ConfirmationForm = () => {
       fetch(`${import.meta.env.VITE_HOST}users/confirmInvite/${id}`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
-            // console.log(result)
-            setAlertMessage("Asistencia confirmada");
-            setAlertVariant("success");
+            setAlertMessage('Asistencia confirmada');
+            setAlertVariant('success');
             setShowAlert(true);
             // setInterval(() => {
                navigate('/wedding/' + id)
             // }, 2000)
          })
          .catch((error) => {
-            console.log(error)
-            setAlertMessage("No se ha podido confirmar");
-            setAlertVariant("error");
+            setAlertMessage('No se ha podido confirmar');
+            setAlertVariant('error');
             setShowAlert(true)
             setBtnLoading(false)
          })

@@ -1,12 +1,12 @@
-import ListGuests from "./ListGuests"
-import SpaceTables, { IGuest, ITable } from "./SpaceTables"
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import ControlPanel from "./ControlPanel";
-import Message from "../../Message";
-import DialogTable from "./DialogTable";
-import { Box, Popover, Typography } from "@mui/material";
-import PropagateLoader from "react-spinners/PropagateLoader";
+import ListGuests from './ListGuests'
+import SpaceTables, { IGuest, ITable } from './SpaceTables'
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import ControlPanel from './ControlPanel';
+import Message from '../../Message';
+import DialogTable from './DialogTable';
+import { Box, Popover, Typography } from '@mui/material';
+import PropagateLoader from 'react-spinners/PropagateLoader';
 
 export interface DialogEditProps {
    open: boolean;
@@ -24,10 +24,11 @@ export interface IPopoverSeat {
 
 
 const AppTables = () => {
+
    const [loading, setLoading] = useState<boolean>(false);
    const [showAlert, setShowAlert] = useState(false);
-   const [alertVariant, setAlertVariant] = useState<"error" | "info" | "success" | "warning">("info");
-   const [alertMessage, setAlertMessage] = useState("");
+   const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
+   const [alertMessage, setAlertMessage] = useState('');
 
    const [guests, setGuests] = useState<IGuest[]>([])
    const [groups, setGroups] = useState<string[]>([])
@@ -50,20 +51,20 @@ const AppTables = () => {
       fetch(`${import.meta.env.VITE_HOST}userRole/${id}`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
-            console.log(result.response)
-            if (result.response !== 'organizer' && !result.admin) navigate('/')
+            if (result.data !== 'organizer' && result.data !== 'admin') { 
+               navigate('/')
+            }
          })
          .catch((error) => {
-            console.log(error)
+            console.error(error)
          })
       fetch(`${import.meta.env.VITE_HOST}guestsNotSeated/${id}`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
-            // console.log(result.data)
             setGuests(result.data.map((g: { id: number, name: string, plusOne: string, group: string, }) => ({ ...g, numSeat: -1 })))
          })
-         .catch(() => {
-            console.log('error: guests not found')
+         .catch((error) => {
+            console.error(error)
             setLoading(false)
          })
 
@@ -72,8 +73,8 @@ const AppTables = () => {
          .then((result) => {
             setGroups([...result, 'Sin asignar'])
          })
-         .catch(() => {
-            console.log('error: groups not found')
+         .catch((error) => {
+            console.error('Groups not found: ' + error)
             setLoading(false)
          })
 
@@ -83,8 +84,8 @@ const AppTables = () => {
             setTables(result.data)
             setLoading(false)
          })
-         .catch(() => {
-            console.log('error: boda no encontrada')
+         .catch((error) => {
+            console.error('Boda no encontrada: ' + error)
             setLoading(false)
          })
    }, [id, navigate])
@@ -113,9 +114,8 @@ const AppTables = () => {
                setShowAlert(true)
             })
             .catch((error) => {
-               console.log('error', error)
                setShowAlert(true);
-               setAlertMessage('No se ha podido actualizar')
+               setAlertMessage('No se ha podido actualizar: ' + error)
                setAlertVariant('error')
             })
       })
@@ -137,16 +137,14 @@ const AppTables = () => {
       fetch(`${import.meta.env.VITE_HOST}tables/${id}`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
-            console.log(result.data)
             setTables([...tables, { ...result.data, guests: [] }])
             setAlertMessage('Mesa creada')
             setAlertVariant('success')
             setShowAlert(true)
          })
          .catch((error) => {
-            console.log('error', error)
             setShowAlert(true);
-            setAlertMessage('No se ha podido crear la mesa')
+            setAlertMessage('No se ha podido crear la mesa: ' + error)
             setAlertVariant('error')
          })
    }
@@ -176,9 +174,8 @@ const AppTables = () => {
             }
          })
          .catch((error) => {
-            console.log('error', error)
             setShowAlert(true);
-            setAlertMessage('No se ha podido eliminar la mesa')
+            setAlertMessage('No se ha podido eliminar la mesa: ' + error)
             setAlertVariant('error')
          })
    }
@@ -213,7 +210,6 @@ const AppTables = () => {
       updateTable(table)
       setOpenDialog(false);
       if (newDeletedSeats) {
-         console.log(newDeletedSeats)
          setGuests([...guests, ...newDeletedSeats])
       }
       setTableDialog(undefined);
@@ -252,7 +248,6 @@ const AppTables = () => {
    }
 
    const checkOverTables = (position: { x: number, y: number }, newGuest: IGuest, onlyCheck?: boolean): number => {
-      console.log("asd")
       tables.forEach(table => {
          const distance = Math.sqrt(
             Math.pow(position.x - table.pos_x, 2) + Math.pow(position.y - table.pos_y, 2)
@@ -263,7 +258,6 @@ const AppTables = () => {
             }
             if (newGuest.plusOne === null) {
                const seat = findSeat(table)
-               console.log(seat)
                if (seat !== -1) {
                   setGuest(undefined)
                   updateTable({ ...table, guests: [...table.guests, { ...newGuest, numSeat: seat, isPlusOne: false }] })
@@ -274,7 +268,6 @@ const AppTables = () => {
                }
             } else {
                const bothSeats = findTwoSeats(table)
-               console.log(bothSeats)
                if (bothSeats[0] !== -1) {
                   const newGuests = [
                      { ...newGuest, numSeat: bothSeats[0], isPlusOne: false },

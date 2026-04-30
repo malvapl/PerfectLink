@@ -31,7 +31,7 @@ const Extras = (props: {
    buses: IBus[] | string,
    prewedding: IPrewedding | string,
    setShowAlert: (a: boolean) => void,
-   setAlertVariant: (a: "error" | "info" | "success" | "warning") => void,
+   setAlertVariant: (a: 'error' | 'info' | 'success' | 'warning') => void,
    setAlertMessage: (a: string) => void
 }) => {
 
@@ -67,13 +67,9 @@ const Extras = (props: {
       myHeaders.append("Content-Type", "application/json");
       myHeaders.append("Authorization", `Bearer ${token}`);
 
-      console.log(deletedBuses.filter(b => b.id !== undefined).map(b => ({ ...b, deleted: true })))
-
       const allBuses = concat(buses.map(b => ({ ...b, deleted: false })), deletedBuses.filter(b => b.id !== undefined).map(b => ({ ...b, deleted: true })))
-      console.log(allBuses)
       allBuses.forEach(bus => {
          const raw = JSON.stringify(bus);
-         console.log(raw)
          const requestOptions: RequestInit = {
             method: "POST",
             headers: myHeaders,
@@ -83,30 +79,26 @@ const Extras = (props: {
          fetch(`${import.meta.env.VITE_HOST}wedding/updateBus/${id}`, requestOptions)
             .then((response) => response.json())
             .then((result) => {
-               console.log(result)
                setDeletedBuses([])
                props.setAlertMessage('Datos actualizados')
                props.setAlertVariant('success')
                props.setShowAlert(true)
             })
             .catch((error) => {
-               console.log('error', error)
                props.setShowAlert(true);
-               props.setAlertMessage('No se ha podido actualizar')
+               props.setAlertMessage('No se ha podido actualizar: ' + error)
                props.setAlertVariant('error')
             })
       })
    }
 
    const handleSaveBus = async (bus: IBus) => {
-      console.log(bus)
       const token = JSON.parse(localStorage.getItem("token") || '');
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       myHeaders.append("Authorization", `Bearer ${token}`);
 
       const raw = JSON.stringify({ ...bus, deleted: false });
-      console.log(raw)
       const requestOptions: RequestInit = {
          method: "POST",
          headers: myHeaders,
@@ -116,16 +108,14 @@ const Extras = (props: {
       fetch(`${import.meta.env.VITE_HOST}wedding/addBus/${id}`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
-            console.log(result)
             setBuses([...buses, { ...result.data, deleted: false }])
             props.setAlertMessage('Bus añadido')
             props.setAlertVariant('success')
             props.setShowAlert(true)
          })
          .catch((error) => {
-            console.log('error', error)
             props.setShowAlert(true);
-            props.setAlertMessage('No se ha podido añadir')
+            props.setAlertMessage('No se ha podido añadir: ' + error)
             props.setAlertVariant('error')
          })
    }
@@ -148,7 +138,6 @@ const Extras = (props: {
       myHeaders.append("Authorization", `Bearer ${token}`);
 
       const raw = JSON.stringify({ location, time: time?.format('HH:mm') });
-      console.log(raw)
       const requestOptions: RequestInit = {
          method: "POST",
          headers: myHeaders,
@@ -158,15 +147,13 @@ const Extras = (props: {
       fetch(`${import.meta.env.VITE_HOST}wedding/updatePrewedding/${id}`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
-            console.log(result)
             props.setAlertMessage('Datos actualizados')
             props.setAlertVariant('success')
             props.setShowAlert(true)
          })
          .catch((error) => {
-            console.log('error', error)
             props.setShowAlert(true);
-            props.setAlertMessage('No se ha podido actualizar')
+            props.setAlertMessage('No se ha podido actualizar: ' + error)
             props.setAlertVariant('error')
          })
    }
@@ -185,16 +172,14 @@ const Extras = (props: {
       fetch(`${import.meta.env.VITE_HOST}cancelBuses/${id}`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
-            console.log(result)
             props.setAlertMessage('Buses cancelados')
             window.location.reload();
             props.setAlertVariant('success')
             props.setShowAlert(true)
          })
          .catch((error) => {
-            console.log('error', error)
             props.setShowAlert(true);
-            props.setAlertMessage('No se ha podido actualizar')
+            props.setAlertMessage('No se ha podido actualizar: ' + error)
             props.setAlertVariant('error')
          })
    }
@@ -213,16 +198,14 @@ const Extras = (props: {
       fetch(`${import.meta.env.VITE_HOST}cancelPrewedding/${id}`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
-            console.log(result)
             props.setAlertMessage('Preboda cancelada')
             window.location.reload();
             props.setAlertVariant('success')
             props.setShowAlert(true)
          })
          .catch((error) => {
-            console.log('error', error)
             props.setShowAlert(true);
-            props.setAlertMessage('No se ha podido actualizar')
+            props.setAlertMessage('No se ha podido actualizar: ' + error)
             props.setAlertVariant('error')
          })
    }
@@ -320,7 +303,6 @@ const Extras = (props: {
          open={openDialog}
          bus={editBus}
          handleClose={(b: IBus) => {
-            console.log(b)
             if (b.id) {
                setBuses(buses.map(bus => bus.id === b.id ? b : bus))
             } else {

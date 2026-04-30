@@ -1,12 +1,12 @@
-import { Dialog, DialogActions, DialogContent, DialogTitle, FormLabel, Grid, IconButton, Stack, Switch, TextField } from "@mui/material";
-import { Button } from "react-bootstrap";
+import { Dialog, DialogActions, DialogContent, DialogTitle, FormLabel, Grid, IconButton, Stack, Switch, TextField } from '@mui/material';
+import { Button } from 'react-bootstrap';
 import CloseIcon from '@mui/icons-material/Close';
-import { useEffect, useState } from "react";
-import { IBus } from "./Extras";
-import dayjs from "dayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import { useEffect, useState } from 'react';
+import { IBus } from './Extras';
+import dayjs from 'dayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
 const BusDialog = (props: {
    open: boolean,
@@ -39,13 +39,6 @@ const BusDialog = (props: {
    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      console.log({
-         id: props.bus?.id,
-         departure: departure.format('HH:mm'),
-         direction: direction,
-         start: start,
-         end: end
-      })
       props.handleClose({
          id: props.bus?.id,
          departure: departure.format('HH:mm'),

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Card } from 'react-bootstrap'
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import InfoCardDialog from './InfoCardDialog';
-import InfoCard from "./InfoCard"
+import InfoCard from './InfoCard'
 import { InfoExtra } from './AppInfo';
 import { useParams } from 'react-router-dom';
 
@@ -21,7 +21,7 @@ export interface OptionCardData {
 const CustomInfo = (props: {
    info: InfoExtra[],
    setShowAlert: (a: boolean) => void,
-   setAlertVariant: (a: "error" | "info" | "success" | "warning") => void,
+   setAlertVariant: (a: 'error' | 'info' | 'success' | 'warning') => void,
    setAlertMessage: (a: string) => void
 }) => {
 
@@ -90,15 +90,13 @@ const CustomInfo = (props: {
          fetch(`${import.meta.env.VITE_HOST}wedding/extraCards/${id}`, requestOptions)
             .then((response) => response.json())
             .then((result) => {
-               console.log(result)
                props.setAlertMessage('Datos actualizados')
                props.setAlertVariant('success')
                props.setShowAlert(true)
             })
             .catch((error) => {
-               console.log('error', error)
                props.setShowAlert(true);
-               props.setAlertMessage('No se ha podido actualizar')
+               props.setAlertMessage('No se ha podido actualizar: ' + error)
                props.setAlertVariant('error')
             })
       })
@@ -127,9 +125,8 @@ const CustomInfo = (props: {
             props.setShowAlert(true)
          })
          .catch((error) => {
-            console.log('error', error)
             props.setShowAlert(true);
-            props.setAlertMessage('No se ha podido añadir')
+            props.setAlertMessage('No se ha podido añadir: ' + error)
             props.setAlertVariant('error')
          })
    }

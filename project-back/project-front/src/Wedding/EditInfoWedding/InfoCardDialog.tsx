@@ -1,7 +1,7 @@
-import { Dialog, DialogActions, DialogContent, DialogTitle, IconButton, TextField } from "@mui/material";
-import { Button } from "react-bootstrap";
+import { Dialog, DialogActions, DialogContent, DialogTitle, IconButton, TextField } from '@mui/material';
+import { Button } from 'react-bootstrap';
 import CloseIcon from '@mui/icons-material/Close';
-import { useState } from "react";
+import { useState } from 'react';
 
 const InfoCardDialog = (props: { open: boolean, handleClose: (d: { title: string, description: string }) => void, handleCancel: () => void }) => {
 

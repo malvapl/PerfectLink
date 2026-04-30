@@ -1,10 +1,10 @@
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, IconButton, Button, Tooltip } from "@mui/material";
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, IconButton, Button, Tooltip } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { useEffect, useState } from "react";
-import { IGuest, ITable } from "./SpaceTables";
+import { useEffect, useState } from 'react';
+import { IGuest, ITable } from './SpaceTables';
 import DeleteIcon from '@mui/icons-material/Delete';
 import '../../styles.css';
-import ConfirmationDialog from "../../ConfirmationDialog";
+import ConfirmationDialog from '../../ConfirmationDialog';
 
 const DialogTable = (props: {
    table: ITable | undefined,
@@ -29,7 +29,6 @@ const DialogTable = (props: {
       setName(props.table?.name || '')
       setMaxChairs(props.table?.maxChairs || 5)
       setSeats([])
-      console.log(props.table?.guests)
 
       if (props.table) {
          const seats: IGuest[] = [];
@@ -60,7 +59,7 @@ const DialogTable = (props: {
    }
 
    const onDragStart = (event: React.DragEvent<HTMLDivElement>, index: number) => {
-      event.dataTransfer.setData("index", index.toString());
+      event.dataTransfer.setData('index', index.toString());
    }
 
    const onDragOver = (event: React.DragEvent<HTMLDivElement>) => {
@@ -68,7 +67,7 @@ const DialogTable = (props: {
    }
 
    const onDrop = (event: React.DragEvent<HTMLDivElement>, index: number) => {
-      const draggedIndex = event.dataTransfer.getData("index");
+      const draggedIndex = event.dataTransfer.getData('index');
       const draggedIndexNumber = parseInt(draggedIndex);
 
       const tempSeats = [...seats];

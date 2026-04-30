@@ -1,9 +1,9 @@
 import { useForm, SubmitHandler } from 'react-hook-form'
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import { Button, Container, Grid, TextField, Typography } from '@mui/material';
-import { useEffect, useRef, useState } from "react";
-import SpinnerForm from "../SpinnerForm.tsx";
-import InputAdornment from "@mui/material/InputAdornment";
+import { useEffect, useRef, useState } from 'react';
+import SpinnerForm from '../SpinnerForm.tsx';
+import InputAdornment from '@mui/material/InputAdornment';
 import '../styles.css';
 import Message from '../Message.tsx';
 import theme from '../theme/theme.ts';
@@ -21,7 +21,7 @@ function Register() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (localStorage.getItem("token")) navigate('/')
+    if (localStorage.getItem('token')) navigate('/')
   }, [navigate])
 
   const emailDB = async (formdata: FormValues) => {
@@ -40,7 +40,6 @@ function Register() {
   }
 
   const registerUser = async (data: FormValues) => {
-    console.log(data)
     setLoading(true);
 
     const result = await fetch(

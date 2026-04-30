@@ -9,7 +9,6 @@ import dayjs from 'dayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import ConfirmationDialog from '../../ConfirmationDialog';
 
-
 type FormValues = {
    spouse1: string,
    spouse2: string,
@@ -25,7 +24,7 @@ type FormValues = {
 
 const MainInfo = (props: {
    data: FormValues, setShowAlert: (a: boolean) => void,
-   setAlertVariant: (a: "error" | "info" | "success" | "warning") => void,
+   setAlertVariant: (a: 'error' | 'info' | 'success' | 'warning') => void,
    setAlertMessage: (a: string) => void
 }) => {
 
@@ -34,7 +33,7 @@ const MainInfo = (props: {
    const { id } = useParams();
    const { setValue, register, handleSubmit, control, getValues, formState: { isDirty, isValid } }
       = useForm<FormValues>({
-         mode: "onChange", defaultValues: {
+         mode: 'onChange', defaultValues: {
             date: dayjs(),
             maxDateConfirmation: dayjs(),
             startHour: dayjs(),
@@ -42,7 +41,6 @@ const MainInfo = (props: {
       })
 
    useEffect(() => {
-      console.log(props.data)
       setValue('spouse1', props.data.spouse1)
       setValue('spouse2', props.data.spouse2)
       setValue('date', props.data.date)
@@ -75,20 +73,17 @@ const MainInfo = (props: {
          redirect: "follow"
       };
 
-      console.log(raw)
 
       fetch(`${import.meta.env.VITE_HOST}weddings/${id}`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
-            console.log(result)
             props.setAlertMessage('Datos actualizados')
             props.setAlertVariant('success')
             props.setShowAlert(true)
          })
          .catch((error) => {
-            console.log('error', error)
             props.setShowAlert(true);
-            props.setAlertMessage('No se ha podido actualizar')
+            props.setAlertMessage('No se ha podido actualizar: ' + error)
             props.setAlertVariant('error')
          });
    }
@@ -111,16 +106,15 @@ const MainInfo = (props: {
             props.setAlertMessage('Boda eliminada')
             props.setAlertVariant('success')
             props.setShowAlert(true)
-            localStorage.removeItem("hasOwnWedding");
-            window.dispatchEvent(new Event("storage"));
+            localStorage.removeItem('hasOwnWedding');
+            window.dispatchEvent(new Event('storage'));
             setTimeout(() => {
-               navigate("/");
+               navigate('/');
             }, 1000);
          })
          .catch((error) => {
-            console.log('error', error)
             props.setShowAlert(true);
-            props.setAlertMessage('No se ha podido eliminar la boda')
+            props.setAlertMessage('No se ha podido eliminar la boda: ' + error)
             props.setAlertVariant('error')
          })
    }

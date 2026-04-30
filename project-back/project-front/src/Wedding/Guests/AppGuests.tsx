@@ -1,12 +1,12 @@
-import { useNavigate, useParams } from "react-router-dom"
-import List from "./List"
-import { useEffect, useState } from "react"
-import { Guest } from "./List"
-import Message from "../../Message"
-import { Container, Paper } from "@mui/material"
-import ConfirmationDialog from "../../ConfirmationDialog"
-import GuestDialog from "./GuestDialog"
-import PropagateLoader from "react-spinners/PropagateLoader"
+import { useNavigate, useParams } from 'react-router-dom'
+import List from './List'
+import { useEffect, useState } from 'react'
+import { Guest } from './List'
+import Message from '../../Message'
+import { Container, Paper } from '@mui/material'
+import ConfirmationDialog from '../../ConfirmationDialog'
+import GuestDialog from './GuestDialog'
+import PropagateLoader from 'react-spinners/PropagateLoader'
 
 type ExtraData = {
    confirmed: number;
@@ -19,8 +19,8 @@ const AppGuests = () => {
    const { id } = useParams()
    const [loading, setLoading] = useState<boolean>(false);
    const [showAlert, setShowAlert] = useState(false);
-   const [alertVariant, setAlertVariant] = useState<"error" | "info" | "success" | "warning">("info");
-   const [alertMessage, setAlertMessage] = useState("");
+   const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
+   const [alertMessage, setAlertMessage] = useState('');
    const [openConfirmation, setOpenConfirmation] = useState(false)
 
    const [guests, setGuests] = useState<Guest[]>([])
@@ -36,7 +36,6 @@ const AppGuests = () => {
    //TODO filtrar por grupo
 
    useEffect(() => {
-
       setLoading(true);
       const token = JSON.parse(localStorage.getItem("token") || '');
       const myHeaders = new Headers();
@@ -51,11 +50,12 @@ const AppGuests = () => {
       fetch(`${import.meta.env.VITE_HOST}userRole/${id}`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
-            console.log(result.response)
-            if (result.response !== 'organizer' && !result.admin) navigate('/')
+            if (result.data !== 'organizer' && result.data !== 'admin') {
+               navigate('/')
+            }
          })
          .catch((error) => {
-            console.log(error)
+            console.error(error)
          })
       fetch(`${import.meta.env.VITE_HOST}dataGuests/${id}`, requestOptions)
          .then((response) => response.json())
@@ -67,8 +67,8 @@ const AppGuests = () => {
             })
             // setLoading(false)
          })
-         .catch(() => {
-            console.log('error: boda no encontrada')
+         .catch((error) => {
+            console.error(error)
             setLoading(false)
          })
       fetch(`${import.meta.env.VITE_HOST}guestGroups/${id}`, requestOptions)
@@ -77,19 +77,18 @@ const AppGuests = () => {
             setGroups(result)
             // setLoading(false)
          })
-         .catch(() => {
-            console.log('error: boda no encontrada')
+         .catch((error) => {
+            console.error(error)
             setLoading(false)
          })
       fetch(`${import.meta.env.VITE_HOST}guests/${id}`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
-            console.log(result.data)
             setGuests(result.data)
             setLoading(false)
          })
-         .catch(() => {
-            console.log('error: boda no encontrada')
+         .catch((error) => {
+            console.error(error)
             setLoading(false)
          })
 
@@ -109,11 +108,9 @@ const AppGuests = () => {
          body: raw,
          redirect: "follow"
       }
-      console.log(raw)
       fetch(`${import.meta.env.VITE_HOST}removeGuests/${id}`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
-            console.log(result)
             setIds([])
             setAlertMessage('Invitaciones canceladas')
             setAlertVariant('success')
@@ -125,9 +122,8 @@ const AppGuests = () => {
             }
          })
          .catch((error) => {
-            console.log('error', error)
             setShowAlert(true);
-            setAlertMessage('Ha ocurrido un error')
+            setAlertMessage('Ha ocurrido un error: ' + error)
             setAlertVariant('error')
          })
    }
@@ -137,8 +133,6 @@ const AppGuests = () => {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       myHeaders.append("Authorization", `Bearer ${token}`);
-      console.log(guest)
-      console.log(guest.group)
       const raw = JSON.stringify({ group: guest.group || null });
       const requestOptions: RequestInit = {
          method: "POST",
@@ -146,20 +140,17 @@ const AppGuests = () => {
          body: raw,
          redirect: "follow"
       }
-      console.log(raw)
       fetch(`${import.meta.env.VITE_HOST}updateGroup/${id}/${guest.id}`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
-            console.log(result)
             setAlertMessage('Grupo actualizado')
             setAlertVariant('success')
             setShowAlert(true)
             setGuests(guests.map((guest) => guest.id === result.id ? result : guest))
          })
          .catch((error) => {
-            console.log('error', error)
             setShowAlert(true);
-            setAlertMessage('Ha ocurrido un error')
+            setAlertMessage('Ha ocurrido un error: ' + error)
             setAlertVariant('error')
          })
    }
@@ -210,7 +201,6 @@ const AppGuests = () => {
                open={guest !== undefined}
                handleCancel={() => setGuest(undefined)}
                handleClose={(g: Guest) => {
-                  console.log(g)
                   updateGroup(g)
                   setGuest(undefined)
                }}

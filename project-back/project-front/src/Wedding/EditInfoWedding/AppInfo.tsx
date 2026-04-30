@@ -35,8 +35,8 @@ export interface InfoExtra {
 const AppInfo = () => {
 
    const [showAlert, setShowAlert] = useState(false);
-   const [alertVariant, setAlertVariant] = useState<"error" | "info" | "success" | "warning">("info");
-   const [alertMessage, setAlertMessage] = useState("");
+   const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
+   const [alertMessage, setAlertMessage] = useState('');
 
    const navigate = useNavigate();
    const { id } = useParams();
@@ -61,7 +61,6 @@ const AppInfo = () => {
    const [prewedding, setPrewedding] = useState<IPrewedding | string>('');
 
    useEffect(() => {
-      console.log("asd")
       const getWedding = async () => {
          const token = JSON.parse(localStorage.getItem("token") || '');
          const myHeaders = new Headers();
@@ -77,16 +76,16 @@ const AppInfo = () => {
          fetch(`${import.meta.env.VITE_HOST}userRole/${id}`, requestOptions)
             .then((response) => response.json())
             .then((result) => {
-               console.log(result.response)
-               if (result.response !== 'organizer' && !result.admin) navigate('/')
+               if (result.data !== 'organizer' && result.data !== 'admin') {
+                  navigate('/')
+               }
             })
             .catch((error) => {
-               console.log(error)
+               console.error(error)
             })
          fetch(`${import.meta.env.VITE_HOST}wedding/${id}`, requestOptions)
             .then((response) => response.json())
             .then((result) => {
-               console.log(result.data)
                setCodes({ guest: result.data.codeGuest, org: result.data.codeOrg })
                setMainData({
                   spouse1: result.data.spouse1,
@@ -100,18 +99,17 @@ const AppInfo = () => {
                   locationParty: result.data.locationParty,
                   messageGuests: result.data.messageGuests
                })
-            }).catch(() => {
-               console.log('error: boda no encontrada')
+            }).catch((error) => {
+               console.error(error)
                setLoading(false)
             })
 
          fetch(`${import.meta.env.VITE_HOST}weddingInfo/${id}`, requestOptions)
             .then((response) => response.json())
             .then((result) => {
-               // console.log(result.data)
                setInfo(result.data)
-            }).catch(() => {
-               console.log('error: boda no encontrada')
+            }).catch((error) => {
+               console.error(error)
                setLoading(false)
             })
          fetch(`${import.meta.env.VITE_HOST}weddingBuses/${id}`, requestOptions)
@@ -119,8 +117,8 @@ const AppInfo = () => {
             .then((result) => {
                console.log(result.data)
                setBuses(result.data)
-            }).catch(() => {
-               console.log('error: boda no encontrada')
+            }).catch((error) => {
+               console.error(error)
                setLoading(false)
             })
 
@@ -129,8 +127,8 @@ const AppInfo = () => {
             .then((result) => {
                setLoading(false)
                setPrewedding(result.data)
-            }).catch(() => {
-               console.log('error: boda no encontrada')
+            }).catch((error) => {
+               console.error(error)
                setLoading(false)
             })
       }

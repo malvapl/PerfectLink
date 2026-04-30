@@ -1,12 +1,12 @@
-import { useNavigate } from "react-router-dom";
-import Banner from "./Banner"
-import CreateSection from "./CreateSection"
-import JoinSection from "./JoinSection"
+import { useNavigate } from 'react-router-dom';
+import Banner from './Banner'
+import CreateSection from './CreateSection'
+import JoinSection from './JoinSection'
 import '../styles.css';
-import { Box, Card, Container, Dialog, Divider, Grid, Typography } from "@mui/material";
-import { useState } from "react";
-import LoginForm from "../User/LoginForm";
-import theme from "../theme/theme";
+import { Box, Card, Container, Dialog, Divider, Grid, Typography } from '@mui/material';
+import { useState } from 'react';
+import LoginForm from '../User/LoginForm';
+import theme from '../theme/theme';
 
 const Home = () => {
 

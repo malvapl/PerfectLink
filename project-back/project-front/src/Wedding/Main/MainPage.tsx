@@ -1,17 +1,17 @@
-import { Button, Card, Container, Divider, Grid, Paper, Stack, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom"
+import { Button, Card, Container, Divider, Grid, Paper, Stack, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Grow from '@mui/material/Grow';
-import "../../styles.css"
-import { IBus, IPrewedding } from "../EditInfoWedding/Extras";
+import '../../styles.css';
+import { IBus, IPrewedding } from '../EditInfoWedding/Extras';
 import HourglassTopTwoToneIcon from '@mui/icons-material/HourglassTopTwoTone';
 import HourglassBottomTwoToneIcon from '@mui/icons-material/HourglassBottomTwoTone';
 import AirportShuttleIcon from '@mui/icons-material/AirportShuttle';
-import ConfirmationDialog from "../../ConfirmationDialog";
-import Message from "../../Message";
-import SpinnerForm from "../../SpinnerForm";
-import theme from "../../theme/theme";
-import PropagateLoader from "react-spinners/PropagateLoader";
+import ConfirmationDialog from '../../ConfirmationDialog';
+import Message from '../../Message';
+import SpinnerForm from '../../SpinnerForm';
+import theme from '../../theme/theme';
+import PropagateLoader from 'react-spinners/PropagateLoader';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import imageDefault from '../../images/mainWedding/couple.jpg';
 
@@ -43,8 +43,8 @@ interface Info {
 const MainPage = () => {
 
    const [showAlert, setShowAlert] = useState(false);
-   const [alertVariant, setAlertVariant] = useState<"error" | "info" | "success" | "warning">("info");
-   const [alertMessage, setAlertMessage] = useState("");
+   const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
+   const [alertMessage, setAlertMessage] = useState('');
 
    const navigate = useNavigate();
    const { id } = useParams();
@@ -72,7 +72,6 @@ const MainPage = () => {
    const [buses, setBuses] = useState<IBus[]>([]);
    const [prewedding, setPrewedding] = useState<IPrewedding>({ location: '', time: '' });
 
-
    useEffect(() => {
       const getRole = async () => {
          setLoading(true);
@@ -91,29 +90,27 @@ const MainPage = () => {
          fetch(`${import.meta.env.VITE_HOST}userRole/${id}`, requestOptions)
             .then((response) => response.json())
             .then((result) => {
-               console.log(result)
                setRole(result.response);
                if ((result.response === 'guestCanceled' || result.response === 'none') && !result.admin) navigate('/')
             })
             .catch((error) => {
-               console.log(error)
+               console.error(error)
             })
 
          fetch(`${import.meta.env.VITE_HOST}weddingBuses/${id}`, requestOptions)
             .then((response) => response.json())
             .then((result) => {
                setBuses(result.data)
-            }).catch(() => {
-               console.log('error: boda no encontrada')
+            }).catch((error) => {
+               console.error(error)
                setLoading(false)
             })
          fetch(`${import.meta.env.VITE_HOST}weddingPrewedding/${id}`, requestOptions)
             .then((response) => response.json())
             .then((result) => {
-               // console.log(result)
                setPrewedding(result.data)
-            }).catch(() => {
-               console.log('error: boda no encontrada')
+            }).catch((error) => {
+               console.error(error)
                setLoading(false)
             })
       }
@@ -124,18 +121,14 @@ const MainPage = () => {
          }).then((response) => response.json())
             .then((result) => {
                setWedding({
-                  ...result.data, image: result.data.image !== null ?
-                     import.meta.env.VITE_HOST_IMG + result.data.image :
-                     imageDefault,
-                     date: result.data.date.split('-').reverse().join('-'),
-                     maxDateConfirmation:  result.data.maxDateConfirmation !== null ? 
-                     result.data.maxDateConfirmation.split('-').reverse().join('-') :
-                     null,
+                  ...result.data, 
+                  image: result.data.image !== null ? import.meta.env.VITE_HOST_IMG + result.data.image : imageDefault,
+                  date: result.data.date.split('-').reverse().join('-'),
+                  maxDateConfirmation:  result.data.maxDateConfirmation !== null ? result.data.maxDateConfirmation.split('-').reverse().join('-') : null,
                })
                setLoading(false)
-               // console.log(result.data)
-            }).catch(() => {
-               console.log('error: boda no encontrada')
+            }).catch((error) => {
+               console.error(error)
                setLoading(false)
             })
       }
@@ -143,7 +136,6 @@ const MainPage = () => {
       getRole();
       getWedding();
    }, [id, navigate])
-
 
    const [canConfirm, setCanConfirm] = useState(true)
    useEffect(() => {
@@ -180,20 +172,19 @@ const MainPage = () => {
       fetch(`${import.meta.env.VITE_HOST}users/cancelInvite/${id}`, requestOptions)
          .then((response) => response.json())
          .then(() => {
-            window.dispatchEvent(new Event("storage"));
+            window.dispatchEvent(new Event('storage'));
             setTimeout(() => {
-               navigate("/");
+               navigate('/');
             }, 2000);
-            setAlertMessage("Asistencia cancelada");
-            setAlertVariant("success");
+            setAlertMessage('Asistencia cancelada');
+            setAlertVariant('success');
             setShowAlert(true);
             setBtnLoading(false);
          })
          .catch((error) => {
-            console.log(error)
             setBtnLoading(false);
-            setAlertMessage("No se ha podido cancelar");
-            setAlertVariant("error");
+            setAlertMessage('No se ha podido cancelar: ' + error);
+            setAlertVariant('error');
             setShowAlert(true)
             setLoading(false)
          })

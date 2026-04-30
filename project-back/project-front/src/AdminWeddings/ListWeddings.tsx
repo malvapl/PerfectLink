@@ -1,9 +1,10 @@
-import { Container } from "@mui/material";
-import Message from "../Message";
-import PropagateLoader from "react-spinners/PropagateLoader";
-import { useEffect, useState } from "react";
-import Wedding from "./Wedding";
-import { useNavigate } from "react-router-dom";
+import { Container } from '@mui/material';
+import Message from '../Message';
+import PropagateLoader from 'react-spinners/PropagateLoader';
+import { useEffect, useState } from 'react';
+import Wedding from './Wedding';
+import { useNavigate } from 'react-router-dom';
+import { useApi } from '../hooks/useApi';
 
 export interface IWedding {
    id: number;
@@ -23,8 +24,8 @@ const ListWeddings = () => {
    const navigate = useNavigate()
    const [loading, setLoading] = useState<boolean>(false);
    const [showAlert, setShowAlert] = useState(false);
-   const [alertVariant, setAlertVariant] = useState<"error" | "info" | "success" | "warning">("info");
-   const [alertMessage, setAlertMessage] = useState("");
+   const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
+   const [alertMessage, setAlertMessage] = useState('');
 
    const [weddings, setWeddings] = useState<IWedding[]>([])
 
@@ -44,21 +45,22 @@ const ListWeddings = () => {
       fetch(`${import.meta.env.VITE_HOST}checkAdmin`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
-            if (!result) navigate('/')
+            if (!result) {
+               navigate('/')
+            }
          })
          .catch((error) => {
-            console.log(error)
+            console.error(error)
          })
 
       fetch(`${import.meta.env.VITE_HOST}weddings`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
-            console.log(result)
             setWeddings(result.data)
             setLoading(false)
          })
-         .catch(() => {
-            console.log('error: boda no encontrada')
+         .catch((error) => {
+            console.error(error)
             setLoading(false)
          })
 
@@ -78,17 +80,16 @@ const ListWeddings = () => {
       fetch(`${import.meta.env.VITE_HOST}weddings/${weddingId}`, requestOptions)
          .then((response) => response.json())
          .then((result) => {
-            setWeddings(weddings.filter(w => w.id !== result.id))
-            localStorage.removeItem("hasOwnWedding");
-            window.dispatchEvent(new Event("storage"));
+            setWeddings(weddings.filter(w => w.id !== weddingId))
+            localStorage.removeItem('hasOwnWedding');
+            window.dispatchEvent(new Event('storage'));
             setAlertMessage('Boda eliminada')
             setAlertVariant('success')
             setShowAlert(true)
          })
          .catch((error) => {
-            console.log('error', error)
             setShowAlert(true);
-            setAlertMessage('Ha ocurrido un error')
+            setAlertMessage('Ha ocurrido un error: ' + error)
             setAlertVariant('error')
          })
    }

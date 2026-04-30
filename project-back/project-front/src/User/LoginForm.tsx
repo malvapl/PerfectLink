@@ -1,10 +1,10 @@
 //import { useState } from 'react'
 import { Button, Container, Grid, TextField, Typography } from '@mui/material';
-import { SubmitHandler, useForm } from "react-hook-form";
-import SpinnerForm from "../SpinnerForm";
-import InputAdornment from "@mui/material/InputAdornment";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { SubmitHandler, useForm } from 'react-hook-form';
+import SpinnerForm from '../SpinnerForm';
+import InputAdornment from '@mui/material/InputAdornment';
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import Message from '../Message';
 import theme from '../theme/theme';
 
@@ -18,27 +18,27 @@ function LoginForm(props: { dialogLogin?: (open: boolean, action: 'join' | 'crea
 
     const navigate = useNavigate();
     const [showAlert, setShowAlert] = useState(false);
-    const [alertVariant, setAlertVariant] = useState<"error" | "info" | "success" | "warning">("info");
-    const [alertMessage, setAlertMessage] = useState("");
+    const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
+    const [alertMessage, setAlertMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
     function redirigir() {
-        window.dispatchEvent(new Event("storage"));
-        navigate("/");
+        window.dispatchEvent(new Event('storage'));
+        navigate('/');
     }
 
     useEffect(()=>{
-        if (localStorage.getItem("token")) navigate('/')
+        if (localStorage.getItem('token')) navigate('/')
     }, [navigate])
 
     const { register, handleSubmit, reset,
         formState: { errors, isDirty, isValid } }
         = useForm<FormValues>({
             defaultValues: {
-                email: "", password: ""
+                email: '', password: ''
             },
-            mode: "onChange"
+            mode: 'onChange'
         })
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
