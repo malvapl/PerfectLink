@@ -171,8 +171,7 @@ class WeddingApiController extends Controller
          $data['image'] = $rutaimg;
       }
 
-      $wedding->update($data);
-      return new WeddingGeneralResource($wedding);
+      return ['success' => (bool) $wedding->update($data)];
    }
 
    public function updateBus(CreateBusWeddingRequest $request, string $idWedding)
