@@ -306,25 +306,23 @@ class WeddingApiController extends Controller
 
       $data = $request->all();
 
-      if (isset($data['subtitle']) && $data['subtitle'] == 'delete') {
-         if (isset($data['id'])) {
-            $info = Info::find($data['id']);
-            $info->delete();
-         }
-      } else if (isset($data['id'])) {
+      if (isset($data['subtitle']) && $data['subtitle'] == 'delete' && isset($data['id'])) {
+         $info = Info::find($data['id']);
+         return ['success' => (bool) $info->delete(), 'message' => 'Card deleted'];
+      }
+
+      if (isset($data['id'])) {
          $info = Info::find($data['id']);
          $info->title = $data['title'];
          $info->subtitle = $data['subtitle'];
          $info->description = $data['description'];
          $info->delete = $data['delete'];
          $info->enabled = $data['enabled'];
-         $info->save();
-      } else {
-         $data['wedding_id'] = $idWedding;
-         $info = Info::create($data);
+         return ['success' => (bool) $info->save(), 'message' => 'Card updated'];
       }
 
-      return new ResourceCollection(InfoResource::collection($wedding->infos()->get()));
+      $data['wedding_id'] = $idWedding;
+      return ['success' => (bool) Info::create($data), 'message' => 'Card created'];
    }
 
    public function addInfoCard(CreateInfoWeddingRequest $request, string $idWedding)
