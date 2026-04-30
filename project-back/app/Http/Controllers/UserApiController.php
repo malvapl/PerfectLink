@@ -10,45 +10,40 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules;
-use Laravel\Sanctum\PersonalAccessToken;
 
 class UserApiController extends Controller
 {
 
    /**
-    * Login user
-    *
-    * @param Request $request
-    * @return \Illuminate\Http\JsonResponse token and idWedding if exists
+    * Log in user and check if they own a wedding
     */
    public function login(Request $request)
    {
       $credentials = $request->only('email', 'password');
 
-      if (Auth::attempt($credentials)) {
-         $user = Auth::user();
+      abort_if(!Auth::attempt($credentials), 401, 'Unauthorized');
 
-         $token = $user->createToken('API Token')->plainTextToken;
+      $user = Auth::user();
 
-         $idWedding = $user->hasOwnWedding();
-         if ($idWedding !== 0) {
-            return response()->json(['token' => $token, 'wedding' => $idWedding]);
-         } else {
-            return response()->json(['token' => $token]);
-         }
-      } else {
-         return response()->json(['message' => 'Unauthorized'], 401);
+      $token = $user->createToken('API Token')->plainTextToken;
+
+      $result = ['token' => $token];
+
+      if ($user->is_admin) {
+         return $result;
       }
+
+      $idWedding = $user->hasOwnWedding();
+      if ($idWedding !== 0) {
+         $result['wedding'] = $idWedding;
+      }
+
+      return $result;
    }
 
-   /**
-    * Register user
-    *
-    * @param Request $request
-    * @return \Illuminate\Http\JsonResponse user or error
-    */
    public function register(Request $request)
    {
       $validator = Validator::make($request->all(), [
@@ -58,20 +53,18 @@ class UserApiController extends Controller
          'password' => ['required', 'confirmed', Rules\Password::defaults()]
       ]);
 
-      if ($validator->fails()) {
-         return response()->json(['error' => $validator->errors()], 422);
-      }
+      abort_if($validator->fails(), 422, $validator->errors());
 
       $user = User::create([
          'name' => $request->name,
          'lastname' => $request->lastname,
          'email' => $request->email,
-         'password' => password_hash($request->password, PASSWORD_BCRYPT)
+         'password' => Hash::make($request->password)
       ]);
 
       event(new Registered($user));
 
-      return response()->json($user);
+      return response()->noContent();
    }
 
    /**
