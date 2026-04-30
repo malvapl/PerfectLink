@@ -125,7 +125,7 @@ class WeddingApiController extends Controller
          $pw->save();
       }
 
-      return ['id' => $wedding->id];
+      return ['id' => (int) $wedding->id];
    }
 
    public function getBuses(string $idWedding, Request $request)
@@ -241,9 +241,8 @@ class WeddingApiController extends Controller
       $pw = Prewedding::where('wedding_id', $idWedding)->first();
       $pw->location = $data['location'];
       $pw->time = $data['time'];
-      $pw->save();
+      return ['success' => (bool) $pw->save()];
 
-      return new ResourceCollection(PreweddingResource::collection($wedding->prewedding()->get()));
    }
 
    public function cancelPrewedding(Request $request, string $idWedding)
@@ -261,9 +260,8 @@ class WeddingApiController extends Controller
       $wedding->save();
 
       $pw = Prewedding::where('wedding_id', $idWedding)->first();
-      $pw->delete();
 
-      return ['data' => 'success'];
+      return ['success' => (bool) $pw->delete()];
    }
 
    /**
@@ -284,11 +282,13 @@ class WeddingApiController extends Controller
       $wedding->save();
 
       $buses = Bus::where('wedding_id', $idWedding)->get();
+
+      $result = true;
       foreach ($buses as $bus) {
-         $bus->delete();
+         $result &= $bus->delete() ?? false;
       }
 
-      return ['data' => 'success'];
+      return ['success' => $result];
    }
 
    /**

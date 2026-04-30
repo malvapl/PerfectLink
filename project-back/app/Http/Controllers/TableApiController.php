@@ -15,7 +15,7 @@ class TableApiController extends Controller
    public function indexTables(Wedding $wedding)
    {
       $tables = $wedding->tables()->with('users')->get();
-      return ['data' => TableResource::customResource($tables, $wedding)];
+      return TableResource::customResource($tables, $wedding);
    }
 
    public function storeTable(CreateTableRequest $request, string $idWedding)
@@ -56,7 +56,6 @@ class TableApiController extends Controller
 
    public function destroyTable(Request $request, Wedding $wedding, string $idTable)
    {
-      $wedding->tables()->find($idTable)->delete(); // TODO control fail
-      return ['response' => 'success'];
+      return ['success' => (bool) $wedding->tables()->find($idTable)->delete()];
    }
 }

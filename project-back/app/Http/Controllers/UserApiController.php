@@ -158,7 +158,7 @@ class UserApiController extends Controller
       $wedding = Wedding::where('codeGuest', $code)->first();
       abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
 
-      return !$wedding ? ['error' => 'not found'] : ['id' => $wedding->id];
+      return ['id' => $wedding->id];
    }
 
    /**
@@ -169,7 +169,7 @@ class UserApiController extends Controller
       $wedding = Wedding::where('codeOrg', $code)->first();
       abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
 
-      return !$wedding ? ['error' => 'not found'] : ['id' => $wedding->id];
+      return ['id' => $wedding->id];
    }
 
    /**

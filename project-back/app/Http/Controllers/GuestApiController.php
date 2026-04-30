@@ -48,7 +48,7 @@ class GuestApiController extends Controller
          return !in_array($guest->id, $seatedGuestIds);
       });
 
-      return ['data' => GuestResource::customResourceTables($notSeatedGuests, $wedding->spouse1, $wedding->spouse2)];
+      return GuestResource::customResourceTables($notSeatedGuests, $wedding->spouse1, $wedding->spouse2); //?
    }
 
    public function confirmInvite(ConfirmationRequest $request, int $idWedding)
@@ -95,9 +95,8 @@ class GuestApiController extends Controller
          $wedding['numGuests'] = $wedding['numGuests'] - 1;
       }
       $wedding['numGuests'] = $wedding['numGuests'] - 1;
-      $wedding->save();
 
-      return ['data' => 'success'];
+      return ['success' => (bool) $wedding->save()];
    }
 
    /**
@@ -139,7 +138,8 @@ class GuestApiController extends Controller
          $value = formatGroup($value, $wedding->spouse1, $wedding->spouse2);
          $values[] = $value;
       }
-      return $values;
+
+      return ['data' => $values];
    }
 
    /**
