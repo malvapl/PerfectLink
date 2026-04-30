@@ -132,7 +132,7 @@ function Register() {
                 fullWidth
                 label="Email"
                 error={!!errors.email || erroremailDB.color}
-                helperText={errors.email ? errors.email.message : '' || erroremailDB.text}
+                helperText={(errors.email ? errors.email.message : '') || erroremailDB.text}
               />
             </Grid>
             <Grid item xs={12}>
