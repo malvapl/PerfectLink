@@ -14,6 +14,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import ConfirmationDialog from '../../ConfirmationDialog';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
+import { useApi } from '../../hooks/useApi';
 
 export interface IBus {
    id?: number;
@@ -35,6 +36,7 @@ const Extras = (props: {
    setAlertMessage: (a: string) => void
 }) => {
 
+   const api = useApi();
    const { id } = useParams();
    const [openDialog, setOpenDialog] = useState(false);
    const [btnDisabledBus, setBtnDisabledBus] = useState(true);
@@ -62,22 +64,9 @@ const Extras = (props: {
    }, [props.buses, props.prewedding])
 
    const handleSaveBuses = async () => {
-      const token = JSON.parse(localStorage.getItem("token") || '');
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
       const allBuses = concat(buses.map(b => ({ ...b, deleted: false })), deletedBuses.filter(b => b.id !== undefined).map(b => ({ ...b, deleted: true })))
       allBuses.forEach(bus => {
-         const raw = JSON.stringify(bus);
-         const requestOptions: RequestInit = {
-            method: "POST",
-            headers: myHeaders,
-            body: raw,
-            redirect: "follow"
-         }
-         fetch(`${import.meta.env.VITE_HOST}wedding/updateBus/${id}`, requestOptions)
-            .then((response) => response.json())
+         api.post(`wedding/updateBus/${id}`, bus)
             .then((result) => {
                setDeletedBuses([])
                props.setAlertMessage('Datos actualizados')
@@ -93,20 +82,7 @@ const Extras = (props: {
    }
 
    const handleSaveBus = async (bus: IBus) => {
-      const token = JSON.parse(localStorage.getItem("token") || '');
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
-      const raw = JSON.stringify({ ...bus, deleted: false });
-      const requestOptions: RequestInit = {
-         method: "POST",
-         headers: myHeaders,
-         body: raw,
-         redirect: "follow"
-      }
-      fetch(`${import.meta.env.VITE_HOST}wedding/addBus/${id}`, requestOptions)
-         .then((response) => response.json())
+      api.post(`wedding/addBus/${id}`, { ...bus, deleted: false })
          .then((result) => {
             setBuses([...buses, { ...result.data, deleted: false }])
             props.setAlertMessage('Bus añadido')
@@ -132,20 +108,7 @@ const Extras = (props: {
    }
 
    const handleSavePW = async () => {
-      const token = JSON.parse(localStorage.getItem("token") || '');
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
-      const raw = JSON.stringify({ location, time: time?.format('HH:mm') });
-      const requestOptions: RequestInit = {
-         method: "POST",
-         headers: myHeaders,
-         body: raw,
-         redirect: "follow"
-      }
-      fetch(`${import.meta.env.VITE_HOST}wedding/updatePrewedding/${id}`, requestOptions)
-         .then((response) => response.json())
+      api.post(`wedding/updatePrewedding/${id}`, { location, time: time?.format('HH:mm') })
          .then((result) => {
             props.setAlertMessage('Datos actualizados')
             props.setAlertVariant('success')
@@ -159,18 +122,7 @@ const Extras = (props: {
    }
 
    const handleCancelBuses = async () => {
-      const token = JSON.parse(localStorage.getItem("token") || '');
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
-      const requestOptions: RequestInit = {
-         method: "POST",
-         headers: myHeaders,
-         redirect: "follow"
-      }
-      fetch(`${import.meta.env.VITE_HOST}cancelBuses/${id}`, requestOptions)
-         .then((response) => response.json())
+      api.post(`cancelBuses/${id}`, {})
          .then((result) => {
             props.setAlertMessage('Buses cancelados')
             window.location.reload();
@@ -185,18 +137,7 @@ const Extras = (props: {
    }
 
    const handleCancelPW = async () => {
-      const token = JSON.parse(localStorage.getItem("token") || '');
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
-      const requestOptions: RequestInit = {
-         method: "POST",
-         headers: myHeaders,
-         redirect: "follow"
-      }
-      fetch(`${import.meta.env.VITE_HOST}cancelPrewedding/${id}`, requestOptions)
-         .then((response) => response.json())
+      api.post(`cancelPrewedding/${id}`, {})
          .then((result) => {
             props.setAlertMessage('Preboda cancelada')
             window.location.reload();

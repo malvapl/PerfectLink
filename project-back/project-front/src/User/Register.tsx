@@ -7,6 +7,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import '../styles.css';
 import Message from '../Message.tsx';
 import theme from '../theme/theme.ts';
+import { useApi } from '../hooks/useApi.ts';
 
 type FormValues = {
   name: string
@@ -18,6 +19,7 @@ type FormValues = {
 
 function Register() {
 
+  const api = useApi();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,54 +27,42 @@ function Register() {
   }, [navigate])
 
   const emailDB = async (formdata: FormValues) => {
-    const response = await fetch(
-      `${import.meta.env.VITE_HOST}searchEmail/${formdata.email}`);
-
-    const data = await response.json();
-    console.log(data);
-    if (data.response === 'yes') {
-      setErrorEmailDB({ color: true, text: 'Este email ya está registrado' });
-      return false;
-    } else {
-      registerUser(formdata);
-      setErrorEmailDB({ color: false, text: '' });
-    }
+    api.get(`searchEmail/${formdata.email}`)
+      .then((result) => {
+        if (result.response === 'yes') {
+          setErrorEmailDB({ color: true, text: 'Este email ya está registrado' });
+        } else {
+          registerUser(formdata);
+          setErrorEmailDB({ color: false, text: '' });
+        }
+      })
   }
 
   const registerUser = async (data: FormValues) => {
     setLoading(true);
 
-    const result = await fetch(
-      `${import.meta.env.VITE_HOST}registro`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-      });
-
-    const jsonData = await result.json();
-    console.log(jsonData);
-
-    if (result.ok) {
-      setAlertMessage("Usuario registrado correctamente");
-      setAlertVariant("success");
-      setShowAlert(true);
-      setTimeout(redirigir, 3000);
-    } else {
-      setAlertMessage("No se ha podido registrar el usuario");
-      setAlertVariant("error");
-      setLoading(false)
-    }
+    api.post('register', data)
+      .then((result) => {
+          setAlertMessage('Usuario registrado correctamente');
+          setAlertVariant('success');
+          setShowAlert(true);
+          setTimeout(() => {
+            navigate('/login')
+          }, 3000);
+      })
+      .catch((error) => {
+          setAlertMessage('No se ha podido registrar el usuario');
+          setAlertVariant('error');
+          setLoading(false)
+      })
   }
 
   const [erroremailDB, setErrorEmailDB] = useState({ color: false, text: '' });
 
   const [loading, setLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  const [alertVariant, setAlertVariant] = useState<"error" | "info" | "success" | "warning">("info");
-  const [alertMessage, setAlertMessage] = useState("");
+  const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
+  const [alertMessage, setAlertMessage] = useState('');
   const [showPassword, setShowPassword] = useState({
     showPassword: false,
     showConfPassword: false
@@ -80,25 +70,19 @@ function Register() {
 
   const { register, handleSubmit,
     formState: { errors, isDirty, isValid }, watch }
-    = useForm<FormValues>({ mode: "onChange" })
-
-  function redirigir() {
-    navigate("/login");
-  }
+    = useForm<FormValues>({ mode: 'onChange' })
 
   const password = useRef({});
-  password.current = watch("password", "");
+  password.current = watch('password', '');
   const validatePassword = (value: string) => {
     const confirmPassword = value.trim();
     if (confirmPassword !== password.current) return 'Las contraseñas no coinciden';
     return true;
   }
 
-
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     emailDB(data);
   }
-
 
   return (
     <div id='containerLoginRegister'>

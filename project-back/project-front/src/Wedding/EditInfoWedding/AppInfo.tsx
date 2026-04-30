@@ -9,6 +9,7 @@ import PropagateLoader from 'react-spinners/PropagateLoader';
 import theme from '../../theme/theme';
 import dayjs from 'dayjs';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useApi } from '../../hooks/useApi';
 
 type FormValues = {
    spouse1: string,
@@ -34,6 +35,7 @@ export interface InfoExtra {
 
 const AppInfo = () => {
 
+   const api = useApi();
    const [showAlert, setShowAlert] = useState(false);
    const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
    const [alertMessage, setAlertMessage] = useState('');
@@ -62,19 +64,9 @@ const AppInfo = () => {
 
    useEffect(() => {
       const getWedding = async () => {
-         const token = JSON.parse(localStorage.getItem("token") || '');
-         const myHeaders = new Headers();
-         myHeaders.append("Content-Type", "application/json");
-         myHeaders.append("Authorization", `Bearer ${token}`);
-
-         const requestOptions: RequestInit = {
-            method: "GET",
-            headers: myHeaders,
-            redirect: "follow"
-         }
          setLoading(true);
-         fetch(`${import.meta.env.VITE_HOST}userRole/${id}`, requestOptions)
-            .then((response) => response.json())
+         
+         api.get(`userRole/${id}`)
             .then((result) => {
                if (result.data !== 'organizer' && result.data !== 'admin') {
                   navigate('/')
@@ -83,8 +75,8 @@ const AppInfo = () => {
             .catch((error) => {
                console.error(error)
             })
-         fetch(`${import.meta.env.VITE_HOST}wedding/${id}`, requestOptions)
-            .then((response) => response.json())
+
+         api.get(`wedding/${id}`)
             .then((result) => {
                setCodes({ guest: result.data.codeGuest, org: result.data.codeOrg })
                setMainData({
@@ -104,26 +96,23 @@ const AppInfo = () => {
                setLoading(false)
             })
 
-         fetch(`${import.meta.env.VITE_HOST}weddingInfo/${id}`, requestOptions)
-            .then((response) => response.json())
+         api.get(`weddingInfo/${id}`)
             .then((result) => {
                setInfo(result.data)
             }).catch((error) => {
                console.error(error)
                setLoading(false)
             })
-         fetch(`${import.meta.env.VITE_HOST}weddingBuses/${id}`, requestOptions)
-            .then((response) => response.json())
+
+         api.get(`weddingBuses/${id}`)
             .then((result) => {
-               console.log(result.data)
                setBuses(result.data)
             }).catch((error) => {
                console.error(error)
                setLoading(false)
             })
 
-         fetch(`${import.meta.env.VITE_HOST}weddingPrewedding/${id}`, requestOptions)
-            .then((response) => response.json())
+         api.get(`weddingPrewedding/${id}`)
             .then((result) => {
                setLoading(false)
                setPrewedding(result.data)

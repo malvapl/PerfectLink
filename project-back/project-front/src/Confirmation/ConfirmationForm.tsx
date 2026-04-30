@@ -7,6 +7,7 @@ import Message from '../Message.tsx';
 import { Spinner } from 'react-bootstrap';
 import { pickBy } from 'lodash';
 import theme from '../theme/theme.ts';
+import { useApi } from '../hooks/useApi';
 
 type FormValues = {
    plusOne?: string,
@@ -19,6 +20,7 @@ type FormValues = {
 
 const ConfirmationForm = () => {
 
+   const api = useApi();
    const navigate = useNavigate();
    const { id } = useParams()
 
@@ -48,18 +50,8 @@ const ConfirmationForm = () => {
       }
 
       setLoading(true);
-      const token = JSON.parse(localStorage.getItem("token") || '');
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
 
-      const requestOptions: RequestInit = {
-         method: "GET",
-         headers: myHeaders,
-         redirect: "follow"
-      }
-      fetch(`${import.meta.env.VITE_HOST}userRole/${id}`, requestOptions)
-         .then((response) => response.json())
+      api.get(`userRole/${id}`)
          .then((result) => {
             if (result.data !== 'guestPending') {
                navigate('/')
@@ -69,8 +61,7 @@ const ConfirmationForm = () => {
             console.error(error)
          })
 
-      fetch(`${import.meta.env.VITE_HOST}guestGroups/${id}`, requestOptions)
-         .then((response) => response.json())
+      api.get(`guestGroups/${id}`)
          .then((result) => {
             setGroups(result)
             setLoading(false)
@@ -83,24 +74,10 @@ const ConfirmationForm = () => {
 
    const onSubmit: SubmitHandler<FormValues> = async (data) => {
       setBtnLoading(true);
-      const token = JSON.parse(localStorage.getItem("token") || '');
-
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
+            
       const sanitizedValues = pickBy(data, value => typeof value !== 'string' || value.length > 0);
-      const raw = JSON.stringify(sanitizedValues);
 
-      const requestOptions: RequestInit = {
-         method: "POST",
-         headers: myHeaders,
-         body: raw,
-         redirect: "follow"
-      };
-
-      fetch(`${import.meta.env.VITE_HOST}users/confirmInvite/${id}`, requestOptions)
-         .then((response) => response.json())
+      api.post(`users/confirmInvite/${id}`, sanitizedValues)
          .then((result) => {
             setAlertMessage('Asistencia confirmada');
             setAlertVariant('success');

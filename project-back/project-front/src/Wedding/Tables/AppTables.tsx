@@ -7,6 +7,7 @@ import Message from '../../Message';
 import DialogTable from './DialogTable';
 import { Box, Popover, Typography } from '@mui/material';
 import PropagateLoader from 'react-spinners/PropagateLoader';
+import { useApi } from '../../hooks/useApi';
 
 export interface DialogEditProps {
    open: boolean;
@@ -25,6 +26,7 @@ export interface IPopoverSeat {
 
 const AppTables = () => {
 
+   const api = useApi();
    const [loading, setLoading] = useState<boolean>(false);
    const [showAlert, setShowAlert] = useState(false);
    const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
@@ -38,18 +40,8 @@ const AppTables = () => {
 
    useEffect(() => {
       setLoading(true);
-      const token = JSON.parse(localStorage.getItem("token") || '');
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
 
-      const requestOptions: RequestInit = {
-         method: "GET",
-         headers: myHeaders,
-         redirect: "follow"
-      }
-      fetch(`${import.meta.env.VITE_HOST}userRole/${id}`, requestOptions)
-         .then((response) => response.json())
+      api.get(`userRole/${id}`)
          .then((result) => {
             if (result.data !== 'organizer' && result.data !== 'admin') { 
                navigate('/')
@@ -58,8 +50,8 @@ const AppTables = () => {
          .catch((error) => {
             console.error(error)
          })
-      fetch(`${import.meta.env.VITE_HOST}guestsNotSeated/${id}`, requestOptions)
-         .then((response) => response.json())
+
+      api.get(`guestsNotSeated/${id}`)
          .then((result) => {
             setGuests(result.data.map((g: { id: number, name: string, plusOne: string, group: string, }) => ({ ...g, numSeat: -1 })))
          })
@@ -68,8 +60,7 @@ const AppTables = () => {
             setLoading(false)
          })
 
-      fetch(`${import.meta.env.VITE_HOST}guestGroups/${id}`, requestOptions)
-         .then((response) => response.json())
+      api.get(`guestGroups/${id}`)
          .then((result) => {
             setGroups([...result, 'Sin asignar'])
          })
@@ -78,8 +69,7 @@ const AppTables = () => {
             setLoading(false)
          })
 
-      fetch(`${import.meta.env.VITE_HOST}tables/${id}`, requestOptions)
-         .then((response) => response.json())
+      api.get(`tables/${id}`)
          .then((result) => {
             setTables(result.data)
             setLoading(false)
@@ -91,22 +81,8 @@ const AppTables = () => {
    }, [id, navigate])
 
    const handleSave = async () => {
-      const token = JSON.parse(localStorage.getItem("token") || '');
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
       tables.forEach(table => {
-         const raw = JSON.stringify(table);
-
-         const requestOptions: RequestInit = {
-            method: "PATCH",
-            headers: myHeaders,
-            body: raw,
-            redirect: "follow"
-         }
-         fetch(`${import.meta.env.VITE_HOST}updateTables/${table.id}`, requestOptions)
-            .then((response) => response.json())
+         api.patch(`updateTables/${table.id}`, table)
             .then((result) => {
                console.log(result)
                setAlertMessage('Datos actualizados')
@@ -122,20 +98,7 @@ const AppTables = () => {
    }
 
    const handleSaveNewTable = async (table: ITable) => {
-      const token = JSON.parse(localStorage.getItem("token") || '');
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
-      const raw = JSON.stringify(table);
-      const requestOptions: RequestInit = {
-         method: "POST",
-         headers: myHeaders,
-         body: raw,
-         redirect: "follow"
-      }
-      fetch(`${import.meta.env.VITE_HOST}tables/${id}`, requestOptions)
-         .then((response) => response.json())
+      api.post(`tables/${id}`, table)
          .then((result) => {
             setTables([...tables, { ...result.data, guests: [] }])
             setAlertMessage('Mesa creada')
@@ -150,20 +113,7 @@ const AppTables = () => {
    }
 
    const deleteTable = async (table: ITable) => {
-      const token = JSON.parse(localStorage.getItem("token") || '');
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
-      const raw = JSON.stringify(table);
-      const requestOptions: RequestInit = {
-         method: "DELETE",
-         headers: myHeaders,
-         body: raw,
-         redirect: "follow"
-      }
-      fetch(`${import.meta.env.VITE_HOST}tables/${id}/${table.id}`, requestOptions)
-         .then((response) => response.json())
+      api.delete(`tables/${id}/${table.id}`) //? body: table
          .then((result) => {
             if (result.response === 'success') {
                setTables(tables.filter(t => t.id !== table.id))

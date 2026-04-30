@@ -4,12 +4,14 @@ import Snackbar from '@mui/material/Snackbar';
 import { Alert, Button, Grid, TextField } from '@mui/material';
 import Message from '../Message';
 import SpinnerForm from '../SpinnerForm';
+import { useApi } from '../hooks/useApi';
 
 const JoinSection = (props: {
    message: string, role: string,
    setDialog: (a: { open: boolean, action: 'join' | 'create' | '' }) => void
 }) => {
 
+   const api = useApi();
    const navigate = useNavigate();
    const auth = localStorage.getItem('token') !== null || false;
 
@@ -22,20 +24,8 @@ const JoinSection = (props: {
    const [loading, setLoading] = useState(false)
 
    const joinUser = async (code: string, id: string) => {
-      const token = JSON.parse(localStorage.getItem("token") || '');
 
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
-      const requestOptions: RequestInit = {
-         method: "GET",
-         headers: myHeaders,
-         redirect: "follow"
-      };
-
-      fetch(`${import.meta.env.VITE_HOST}users/joinWedding/${code}`, requestOptions)
-         .then((response) => response.json())
+      api.get(`users/joinWedding/${code}`)
          .then((result) => {
             console.log(result)
             if (result.error) {
@@ -62,16 +52,14 @@ const JoinSection = (props: {
    };
 
    const checkCode = async (code: string) => {
-      const data = await fetch(`${import.meta.env.VITE_HOST}wedding/code${props.role}/${code}`, {
-         method: "GET"
-      });
-      const jsonData = await data.json();
-      if (jsonData['id']) {
-         joinUser(code, jsonData['id']);
-      } else {
-         setLoading(false);
-         setShowAlert(true);
-      }
+      api.get(`wedding/code${props.role}/${code}`, false)
+         .then((result) => {
+            joinUser(code, result.id);
+         })
+         .catch((error) => {
+            setLoading(false);
+            setShowAlert(true);
+         })
    };
 
    function handleChange(e: React.ChangeEvent<HTMLInputElement>) {

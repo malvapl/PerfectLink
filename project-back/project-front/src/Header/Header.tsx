@@ -13,6 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import logo from '../images/home/logo.png';
+import { useApi } from '../hooks/useApi';
 
 const pages = [
    { name: 'Sala principal', route: 'wedding/' },
@@ -38,6 +39,7 @@ interface Wedding {
 
 function Header() {
 
+   const api = useApi();
    const navigate = useNavigate();
    const [auth, setAuth] = useState(localStorage.getItem('token') !== null || false);
    const [token, setToken] = useState('');
@@ -49,16 +51,6 @@ function Header() {
 
    useEffect(() => {
       setAdmin(false)
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
-      const requestOptions: RequestInit = {
-         method: "GET",
-         headers: myHeaders,
-         redirect: "follow"
-      };
-
       window.addEventListener('storage', () => {
          setAdmin(false)
          setAuth(localStorage.getItem('token') !== null || false)
@@ -66,16 +58,16 @@ function Header() {
          if (typeof value === 'string') {
             setToken(JSON.parse(value))
          }
-         getWeddings(requestOptions)
-         checkAdmin(requestOptions)
+         getWeddings()
+         checkAdmin()
          setIdWedding(parseInt(localStorage.getItem('hasOwnWedding') || '') || 0)
       })
       const value = localStorage.getItem('token')
       if (typeof value === 'string') {
          setToken(JSON.parse(value))
       }
-      checkAdmin(requestOptions)
-      getWeddings(requestOptions)
+      checkAdmin()
+      getWeddings()
       setIdWedding(parseInt(localStorage.getItem('hasOwnWedding') || '') || 0)
 
    }, [token])
@@ -84,9 +76,8 @@ function Header() {
       setSettings(auth ? settingsAuth : settingsNoAuth)
    }, [auth])
 
-   const getWeddings = async (requestOptions: RequestInit) => {
-      fetch(`${import.meta.env.VITE_HOST}users/weddings`, requestOptions)
-         .then((response) => response.json())
+   const getWeddings = async () => {
+      api.get('users/weddings')
          .then((result) => {
             setWeddingsUser(result.data);
          })
@@ -95,9 +86,8 @@ function Header() {
          })
    }
 
-   const checkAdmin = async (requestOptions: RequestInit) => {
-      fetch(`${import.meta.env.VITE_HOST}checkAdmin`, requestOptions)
-         .then((response) => response.json())
+   const checkAdmin = async () => {
+      api.get('checkAdmin')
          .then((result) => {
             setAdmin(result);
          })

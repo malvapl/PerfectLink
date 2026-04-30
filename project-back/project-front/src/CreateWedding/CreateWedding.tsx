@@ -12,6 +12,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import theme from '../theme/theme.ts';
+import { useApi } from '../hooks/useApi.ts';
 
 type FormValues = {
    spouse1: string,
@@ -27,6 +28,7 @@ type FormValues = {
 
 const CreateWedding = () => {
 
+   const api = useApi();
    const navigate = useNavigate();
 
    const [loading, setLoading] = useState(false);
@@ -55,38 +57,16 @@ const CreateWedding = () => {
 
    const onSubmit: SubmitHandler<FormValues> = async (data) => {
       setLoading(true);
-      const token = JSON.parse(localStorage.getItem("token") || '');
 
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
-      const raw = JSON.stringify({
+      api.post('weddings', {
          ...data,
          startHour: dayjs(data.startHour).format('HH:mm'),
          date: dayjs(data.date).format('YYYY-MM-DD')
-      });
-
-      const requestOptions: RequestInit = {
-         method: "POST",
-         headers: myHeaders,
-         body: raw,
-         redirect: "follow"
-      };
-
-      fetch(`${import.meta.env.VITE_HOST}weddings`, requestOptions)
-         .then((response) => response.json())
+      })
          .then((result) => {
-            if (result.error) {
-               setAlertMessage(result.error);
-               setAlertVariant("error");
-               setShowAlert(true)
-               setLoading(false)
-               return;
-            } else {
-               console.log(result)
-               setAlertMessage("Creando sala de la boda...");
-               setAlertVariant("success");
+            if (result.id) {
+               setAlertMessage('Creando sala de la boda...');
+               setAlertVariant('success');
                setShowAlert(true);
                localStorage.setItem('hasOwnWedding', JSON.stringify(result.id));
                window.dispatchEvent(new Event('storage'));

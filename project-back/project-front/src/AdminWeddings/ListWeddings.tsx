@@ -21,6 +21,7 @@ export interface IWedding {
 
 const ListWeddings = () => {
 
+   const api = useApi();
    const navigate = useNavigate()
    const [loading, setLoading] = useState<boolean>(false);
    const [showAlert, setShowAlert] = useState(false);
@@ -31,19 +32,8 @@ const ListWeddings = () => {
 
    useEffect(() => {
       setLoading(true);
-      const token = JSON.parse(localStorage.getItem("token") || '');
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
 
-      const requestOptions: RequestInit = {
-         method: "GET",
-         headers: myHeaders,
-         redirect: "follow"
-      }
-
-      fetch(`${import.meta.env.VITE_HOST}checkAdmin`, requestOptions)
-         .then((response) => response.json())
+      api.get('checkAdmin')
          .then((result) => {
             if (!result) {
                navigate('/')
@@ -53,8 +43,7 @@ const ListWeddings = () => {
             console.error(error)
          })
 
-      fetch(`${import.meta.env.VITE_HOST}weddings`, requestOptions)
-         .then((response) => response.json())
+      api.get('weddings')
          .then((result) => {
             setWeddings(result.data)
             setLoading(false)
@@ -67,18 +56,7 @@ const ListWeddings = () => {
    }, [navigate])
 
    const deleteWedding = async (weddingId: number) => {
-      const token = JSON.parse(localStorage.getItem("token") || '');
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
-      const requestOptions: RequestInit = {
-         method: "DELETE",
-         headers: myHeaders,
-         redirect: "follow"
-      }
-      fetch(`${import.meta.env.VITE_HOST}weddings/${weddingId}`, requestOptions)
-         .then((response) => response.json())
+      api.delete(`weddings/${weddingId}`)
          .then((result) => {
             setWeddings(weddings.filter(w => w.id !== weddingId))
             localStorage.removeItem('hasOwnWedding');

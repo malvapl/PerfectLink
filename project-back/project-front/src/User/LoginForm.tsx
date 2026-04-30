@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Message from '../Message';
 import theme from '../theme/theme';
+import { useApi } from '../hooks/useApi';
 
 type FormValues = {
     email: string
@@ -16,6 +17,7 @@ type FormValues = {
 
 function LoginForm(props: { dialogLogin?: (open: boolean, action: 'join' | 'create' | '') => void, action?: 'join' | 'create' | '' }) {
 
+    const api = useApi();
     const navigate = useNavigate();
     const [showAlert, setShowAlert] = useState(false);
     const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
@@ -44,42 +46,32 @@ function LoginForm(props: { dialogLogin?: (open: boolean, action: 'join' | 'crea
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         setLoading(true);
 
-        const result = await fetch(
-            `${import.meta.env.VITE_HOST}login`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            });
-
-        const jsonData = await result.json();
-
-        if (result.ok) {
-            localStorage.setItem("token", JSON.stringify(jsonData.token));
-            if (jsonData.wedding) {
-                localStorage.setItem("hasOwnWedding", JSON.stringify(jsonData.wedding));
-            }
-            setAlertVariant("success");
-            setAlertMessage("Usuario logeado");
-            if (props.dialogLogin) {
+        api.post('login', data)
+            .then((result) => {
+                localStorage.setItem('token', JSON.stringify(result.token));
+                if (result.wedding) {
+                    localStorage.setItem('hasOwnWedding', JSON.stringify(result.wedding));
+                }
+                setAlertVariant('success');
+                setAlertMessage('Usuario logeado');
+                if (props.dialogLogin) {
+                    setShowAlert(true);
+                    setTimeout(() => {
+                        window.dispatchEvent(new Event('storage'));
+                        props.dialogLogin!(true, props.action!)
+                    }, 3000);
+                } else {
+                    setShowAlert(true);
+                    setTimeout(redirigir, 3000);
+                }
+            })
+            .catch((error) => {
+                setAlertMessage('Usuario o contraseña incorrecta. Vuelve a intentarlo');
+                setAlertVariant('error');
                 setShowAlert(true);
-                setTimeout(() => {
-                    window.dispatchEvent(new Event("storage"));
-                    props.dialogLogin!(true, props.action!)
-                }, 3000);
-            } else {
-                setShowAlert(true);
-                setTimeout(redirigir, 3000);
-            }
-        } else {
-            setAlertMessage("Usuario o contraseña incorrecta. Vuelve a intentarlo");
-            setAlertVariant("error");
-            setShowAlert(true);
-            setLoading(false)
-            reset();
-        }
+                setLoading(false)
+                reset();                
+            })
     }
 
     return (

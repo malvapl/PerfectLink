@@ -7,6 +7,7 @@ import { Container, Paper } from '@mui/material'
 import ConfirmationDialog from '../../ConfirmationDialog'
 import GuestDialog from './GuestDialog'
 import PropagateLoader from 'react-spinners/PropagateLoader'
+import { useApi } from '../../hooks/useApi'
 
 type ExtraData = {
    confirmed: number;
@@ -15,6 +16,7 @@ type ExtraData = {
 }
 const AppGuests = () => {
 
+   const api = useApi();
    const navigate = useNavigate()
    const { id } = useParams()
    const [loading, setLoading] = useState<boolean>(false);
@@ -37,18 +39,8 @@ const AppGuests = () => {
 
    useEffect(() => {
       setLoading(true);
-      const token = JSON.parse(localStorage.getItem("token") || '');
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
 
-      const requestOptions: RequestInit = {
-         method: "GET",
-         headers: myHeaders,
-         redirect: "follow"
-      }
-      fetch(`${import.meta.env.VITE_HOST}userRole/${id}`, requestOptions)
-         .then((response) => response.json())
+      api.get(`userRole/${id}`)
          .then((result) => {
             if (result.data !== 'organizer' && result.data !== 'admin') {
                navigate('/')
@@ -57,32 +49,30 @@ const AppGuests = () => {
          .catch((error) => {
             console.error(error)
          })
-      fetch(`${import.meta.env.VITE_HOST}dataGuests/${id}`, requestOptions)
-         .then((response) => response.json())
+
+      api.get(`dataGuests/${id}`)
          .then((result) => {
             setExtraData({
                confirmed: result.confirmed,
                bus: result.bus,
                prewedding: result.prewedding,
             })
-            // setLoading(false)
          })
          .catch((error) => {
             console.error(error)
             setLoading(false)
          })
-      fetch(`${import.meta.env.VITE_HOST}guestGroups/${id}`, requestOptions)
-         .then((response) => response.json())
+
+      api.get(`guestGroups/${id}`)
          .then((result) => {
-            setGroups(result)
-            // setLoading(false)
+            setGroups(result.data)
          })
          .catch((error) => {
             console.error(error)
             setLoading(false)
          })
-      fetch(`${import.meta.env.VITE_HOST}guests/${id}`, requestOptions)
-         .then((response) => response.json())
+
+      api.get(`guests/${id}`)
          .then((result) => {
             setGuests(result.data)
             setLoading(false)
@@ -96,20 +86,8 @@ const AppGuests = () => {
 
    const cancelInvite = async (idUser?: number) => {
       setOpenConfirmation(false)
-      const token = JSON.parse(localStorage.getItem("token") || '');
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
 
-      const raw = idUser ? JSON.stringify({ ids: [idUser] }) : JSON.stringify({ ids });
-      const requestOptions: RequestInit = {
-         method: "POST",
-         headers: myHeaders,
-         body: raw,
-         redirect: "follow"
-      }
-      fetch(`${import.meta.env.VITE_HOST}removeGuests/${id}`, requestOptions)
-         .then((response) => response.json())
+      api.post(`removeGuests/${id}`, idUser ? { ids: [idUser] } : { ids })
          .then((result) => {
             setIds([])
             setAlertMessage('Invitaciones canceladas')
@@ -129,19 +107,7 @@ const AppGuests = () => {
    }
 
    const updateGroup = async (guest: Guest) => {
-      const token = JSON.parse(localStorage.getItem("token") || '');
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-      const raw = JSON.stringify({ group: guest.group || null });
-      const requestOptions: RequestInit = {
-         method: "POST",
-         headers: myHeaders,
-         body: raw,
-         redirect: "follow"
-      }
-      fetch(`${import.meta.env.VITE_HOST}updateGroup/${id}/${guest.id}`, requestOptions)
-         .then((response) => response.json())
+      api.post(`updateGroup/${id}/${guest.id}`, { group: guest.group || null })
          .then((result) => {
             setAlertMessage('Grupo actualizado')
             setAlertVariant('success')

@@ -14,6 +14,7 @@ import theme from '../../theme/theme';
 import PropagateLoader from 'react-spinners/PropagateLoader';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import imageDefault from '../../images/mainWedding/couple.jpg';
+import { useApi } from '../../hooks/useApi';
 
 interface Wedding {
    spouse1: string;
@@ -42,6 +43,7 @@ interface Info {
 
 const MainPage = () => {
 
+   const api = useApi();
    const [showAlert, setShowAlert] = useState(false);
    const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
    const [alertMessage, setAlertMessage] = useState('');
@@ -75,38 +77,26 @@ const MainPage = () => {
    useEffect(() => {
       const getRole = async () => {
          setLoading(true);
-         const token = JSON.parse(localStorage.getItem("token") || '');
 
-         const myHeaders = new Headers();
-         myHeaders.append("Content-Type", "application/json");
-         myHeaders.append("Authorization", `Bearer ${token}`);
-
-         const requestOptions: RequestInit = {
-            method: "GET",
-            headers: myHeaders,
-            redirect: "follow"
-         };
-
-         fetch(`${import.meta.env.VITE_HOST}userRole/${id}`, requestOptions)
-            .then((response) => response.json())
+         api.get(`userRole/${id}`)
             .then((result) => {
-               setRole(result.response);
-               if ((result.response === 'guestCanceled' || result.response === 'none') && !result.admin) navigate('/')
+               setRole(result.data);
+               if ((result.data === 'guestCanceled' || result.data === 'none') && result.data !== 'admin') {
+                  navigate('/')
+               }
             })
             .catch((error) => {
                console.error(error)
             })
 
-         fetch(`${import.meta.env.VITE_HOST}weddingBuses/${id}`, requestOptions)
-            .then((response) => response.json())
+         api.get(`weddingBuses/${id}`)
             .then((result) => {
                setBuses(result.data)
             }).catch((error) => {
                console.error(error)
                setLoading(false)
             })
-         fetch(`${import.meta.env.VITE_HOST}weddingPrewedding/${id}`, requestOptions)
-            .then((response) => response.json())
+         api.get(`weddingPrewedding/${id}`)
             .then((result) => {
                setPrewedding(result.data)
             }).catch((error) => {
@@ -116,9 +106,7 @@ const MainPage = () => {
       }
 
       const getWedding = () => {
-         fetch(`${import.meta.env.VITE_HOST}wedding/${id}`, {
-            method: "GET"
-         }).then((response) => response.json())
+         api.get(`wedding/${id}`)
             .then((result) => {
                setWedding({
                   ...result.data, 
@@ -157,29 +145,19 @@ const MainPage = () => {
    const handleCancelInvite = () => {
       setOpenConfirmation(false)
       setBtnLoading(true);
-      const token = JSON.parse(localStorage.getItem("token") || '');
 
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
-      const requestOptions: RequestInit = {
-         method: "POST",
-         headers: myHeaders,
-         redirect: "follow"
-      };
-
-      fetch(`${import.meta.env.VITE_HOST}users/cancelInvite/${id}`, requestOptions)
-         .then((response) => response.json())
-         .then(() => {
-            window.dispatchEvent(new Event('storage'));
-            setTimeout(() => {
-               navigate('/');
-            }, 2000);
-            setAlertMessage('Asistencia cancelada');
-            setAlertVariant('success');
-            setShowAlert(true);
-            setBtnLoading(false);
+      api.post(`users/cancelInvite/${id}`, {})
+         .then((result) => {
+            if (result.success) {
+               window.dispatchEvent(new Event('storage'));
+               setTimeout(() => {
+                  navigate('/');
+               }, 2000);
+               setAlertMessage('Asistencia cancelada');
+               setAlertVariant('success');
+               setShowAlert(true);
+               setBtnLoading(false);
+            }
          })
          .catch((error) => {
             setBtnLoading(false);

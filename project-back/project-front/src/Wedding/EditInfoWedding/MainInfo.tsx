@@ -8,6 +8,7 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import dayjs from 'dayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import ConfirmationDialog from '../../ConfirmationDialog';
+import { useApi } from '../../hooks/useApi';
 
 type FormValues = {
    spouse1: string,
@@ -28,6 +29,7 @@ const MainInfo = (props: {
    setAlertMessage: (a: string) => void
 }) => {
 
+   const api = useApi();
    const [openConfirmation, setOpenConfirmation] = useState(false);
    const navigate = useNavigate();
    const { id } = useParams();
@@ -54,28 +56,14 @@ const MainInfo = (props: {
    }, [props.data, setValue])
 
    const onSubmit: SubmitHandler<FormValues> = async (data) => {
-      const token = JSON.parse(localStorage.getItem("token") || '');
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
-      const raw = JSON.stringify({
+      const body = {
          ...data,
          startHour: dayjs(data.startHour).format('HH:mm'),
          date: dayjs(data.date).format('YYYY-MM-DD'),
          maxDateConfirmation: dayjs(data.maxDateConfirmation).format('YYYY-MM-DD')
-      });
-
-      const requestOptions: RequestInit = {
-         method: "PATCH",
-         headers: myHeaders,
-         body: raw,
-         redirect: "follow"
       };
 
-
-      fetch(`${import.meta.env.VITE_HOST}weddings/${id}`, requestOptions)
-         .then((response) => response.json())
+      api.patch(`weddings/${id}`, body)
          .then((result) => {
             props.setAlertMessage('Datos actualizados')
             props.setAlertVariant('success')
@@ -89,18 +77,7 @@ const MainInfo = (props: {
    }
 
    const handleDeleteWedding = async () => {
-      const token = JSON.parse(localStorage.getItem("token") || '');
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
-      const requestOptions: RequestInit = {
-         method: "DELETE",
-         headers: myHeaders,
-         redirect: "follow"
-      }
-      fetch(`${import.meta.env.VITE_HOST}weddings/${id}`, requestOptions)
-         .then((response) => response.json())
+      api.delete(`weddings/${id}`)
          .then(() => {
             setOpenConfirmation(false)
             props.setAlertMessage('Boda eliminada')

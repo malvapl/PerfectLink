@@ -6,7 +6,7 @@ import InfoCardDialog from './InfoCardDialog';
 import InfoCard from './InfoCard'
 import { InfoExtra } from './AppInfo';
 import { useParams } from 'react-router-dom';
-
+import { useApi } from '../../hooks/useApi';
 
 export interface OptionCardData {
    id: number,
@@ -25,6 +25,7 @@ const CustomInfo = (props: {
    setAlertMessage: (a: string) => void
 }) => {
 
+   const api = useApi();
    const { id } = useParams();
 
    const [cards, setCards] = useState<OptionCardData[]>([])
@@ -33,11 +34,6 @@ const CustomInfo = (props: {
    const [height, setHeight] = useState<number | undefined>(0);
    const observedDiv = useRef<HTMLInputElement>(null);
    useEffect(() => {
-      const token = JSON.parse(localStorage.getItem("token") || '')
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
       if (!observedDiv.current) {
          return;
       }
@@ -75,20 +71,8 @@ const CustomInfo = (props: {
    }
 
    const handleSave = async () => {
-      const token = JSON.parse(localStorage.getItem("token") || '')
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
       cards.forEach(card => {
-         const raw = JSON.stringify(card);
-         const requestOptions: RequestInit = {
-            method: "POST",
-            headers: myHeaders,
-            body: raw,
-            redirect: "follow"
-         }
-         fetch(`${import.meta.env.VITE_HOST}wedding/extraCards/${id}`, requestOptions)
-            .then((response) => response.json())
+         api.post(`wedding/extraCards/${id}`, card)
             .then((result) => {
                props.setAlertMessage('Datos actualizados')
                props.setAlertVariant('success')
@@ -103,19 +87,7 @@ const CustomInfo = (props: {
    }
 
    const handleSaveCard = async (card: { title: string, description: string }) => {
-      const token = JSON.parse(localStorage.getItem("token") || '')
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-      const raw = JSON.stringify({ ...card, subtitle: "", delete: true, enabled: true });
-      const requestOptions: RequestInit = {
-         method: "POST",
-         headers: myHeaders,
-         body: raw,
-         redirect: "follow"
-      }
-      fetch(`${import.meta.env.VITE_HOST}wedding/extraCard/${id}`, requestOptions)
-         .then((response) => response.json())
+      api.post(`wedding/extraCard/${id}`, { ...card, subtitle: '', delete: true, enabled: true })
          .then((result) => {
             setCards([...cards, result.data])
             setChecked([...checked, result.data.id])
