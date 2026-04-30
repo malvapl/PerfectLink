@@ -13,10 +13,6 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
    return $request->user();
 });
 
-
-Route::get('wedding/{wedding}', [WeddingApiController::class, 'show']);
-Route::get('users/weddings', [UserApiController::class, 'weddings']);
-
 // register login
 Route::post('register', [UserApiController::class, 'register']);
 Route::post('login', [UserApiController::class, 'login']);
@@ -27,10 +23,12 @@ Route::get('wedding/codeGuest/{code}', [UserApiController::class, 'existsCodeGue
 Route::get('wedding/codeOrg/{code}', [UserApiController::class, 'existsCodeOrg']);
 
 Route::middleware('auth:sanctum')->group(function () { //? loggeado
+   Route::get('users/weddings', [UserApiController::class, 'weddings']);
    Route::get('userRole/{wedding}', [UserApiController::class, 'roleWedding']);
    Route::get('checkAdmin', [UserApiController::class, 'isAdmin']);
    Route::post('weddings', [WeddingApiController::class, 'store']); // create wedding
    Route::get('users/joinWedding/{code}', [UserApiController::class, 'joinWedding']);
+   Route::get('wedding/{wedding}', [WeddingApiController::class, 'show']);
 
    // GUEST ONLY
    Route::post('users/confirmInvite/{wedding}', [GuestApiController::class, 'confirmInvite']);
