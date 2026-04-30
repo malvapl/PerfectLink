@@ -353,7 +353,6 @@ class WeddingApiController extends Controller
          abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400));
       }
 
-      $wedding->delete();
-      return ['id' => $wedding->id];
+      return ['success' => (bool) $wedding->delete()];
    }
 }
