@@ -111,7 +111,7 @@ class UserApiController extends Controller
 
       $bus = $wedding->bus ? 0 : null;
       $prewedding = $wedding->prewedding ? 0 : null;
-      $wedding->users()->attach($id_user, ['role_id' => $role, 'bus' => $bus, 'prewedding' => $prewedding]);
+      $wedding->users()->attach($user->id, ['role_id' => $role, 'bus' => $bus, 'prewedding' => $prewedding]);
 
       return new WeddingGeneralResource($wedding);
    }
