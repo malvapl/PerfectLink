@@ -18,8 +18,8 @@ Route::get('wedding/{wedding}', [WeddingApiController::class, 'show']);
 Route::get('users/weddings', [UserApiController::class, 'weddings']);
 
 // register login
-Route::post('registro', [UserApiController::class, 'register'])->name('registro');
-Route::post('login', [UserApiController::class, 'login'])->name('login');
+Route::post('register', [UserApiController::class, 'register']);
+Route::post('login', [UserApiController::class, 'login']);
 Route::get('searchEmail/{email}', [VerificationApiController::class, 'searchEmail']);
 
 // join wedding
