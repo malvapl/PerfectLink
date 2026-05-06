@@ -56,7 +56,7 @@ const AppTables = () => {
             setGuests(result.data.map((g: { id: number, name: string, plusOne: string, group: string, }) => ({ ...g, numSeat: -1 })))
          })
          .catch((error) => {
-            console.error(error)
+            console.error('Users not found:' + error)
             setLoading(false)
          })
 
@@ -75,7 +75,7 @@ const AppTables = () => {
             setLoading(false)
          })
          .catch((error) => {
-            console.error('Boda no encontrada: ' + error)
+            console.error('Mesas no encontradas: ' + error)
             setLoading(false)
          })
    }, [id, navigate])
@@ -84,7 +84,6 @@ const AppTables = () => {
       tables.forEach(table => {
          api.patch(`updateTables/${table.id}`, table)
             .then((result) => {
-               console.log(result)
                setAlertMessage('Datos actualizados')
                setAlertVariant('success')
                setShowAlert(true)
@@ -113,11 +112,11 @@ const AppTables = () => {
    }
 
    const deleteTable = async (table: ITable) => {
-      api.delete(`tables/${id}/${table.id}`) //? body: table
+      api.delete(`tables/${id}/${table.id}`)
          .then((result) => {
             if (result.response === 'success') {
                setTables(tables.filter(t => t.id !== table.id))
-               setGuests([...guests, ...table.guests])
+               setGuests([...guests, ...table.guests]) // TODO fix
                setAlertMessage('Mesa eliminada')
                setAlertVariant('success')
                setShowAlert(true)
