@@ -130,9 +130,8 @@ class UserApiController extends Controller
     */
    public function weddings(Request $request)
    {
-      $user = $request->user();
+      $weddings = $request->user()->weddings()->withPivot('role_id')->whereIn('role_id', [2, 3])->get();
 
-      $weddings = $user->weddings()->withPivot('role_id')->whereIn('role_id', [2, 3])->get();
       return WeddingUserResource::collection($weddings);
    }
 
