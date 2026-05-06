@@ -16,11 +16,11 @@ class WeddingPolicy
     }
 
     /**
-     * Organizer, guestPending, guestConfirmed
+     * Admin, organizer, guestPending, guestConfirmed
      */
     public function view(User $user, Wedding $wedding): bool
     {
-        return $this->hasWeddingRole($user, $wedding, [1, 2, 3]);
+        return $user->is_admin || $this->hasWeddingRole($user, $wedding, [1, 2, 3]);
     }
 
     /**
@@ -34,11 +34,11 @@ class WeddingPolicy
     }
 
     /**
-     * Organizer only
+     * Admin or organizer
      */
     public function update(User $user, Wedding $wedding): bool
     {
-        return $this->hasWeddingRole($user, $wedding, [1]);
+        return $user->is_admin || $this->hasWeddingRole($user, $wedding, [1]);
     }
 
     /**
