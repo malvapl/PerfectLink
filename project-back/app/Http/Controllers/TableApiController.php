@@ -34,7 +34,10 @@ class TableApiController extends Controller
    public function updateTable(UpdateTableRequest $request, Table $table)
    {
       $data = $request->all();
-      $table->update($data);
+
+      if (!$table->update($data)) {
+         return ['success' => false, 'message' => 'Error updating table'];
+      }
 
       if (isset($data['guests'])) {
          foreach ($table->users()->get() as $user) {
@@ -49,9 +52,7 @@ class TableApiController extends Controller
          }
       }
 
-      return $table->users()->withPivot('plusOne')->get();
-
-      return new TableResource($table);
+      return ['success' => true];
    }
 
    public function destroyTable(Request $request, Wedding $wedding, string $idTable)
