@@ -142,13 +142,7 @@ class GuestApiController extends Controller
     */
    public function updateGroup(Request $request, string $idWedding, string $idGuest)
    {
-      $user = $request->user();
-      $id_user = $user->id;
-
       $wedding = Wedding::with('users')->findOrFail($idWedding);
-      if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         abort(response()->json(['message' => 'No tienes permisos para ver esta boda'], 400));
-      }
 
       $guest = $wedding->users()->where('user_id', $idGuest)->first();
       abort_if(!$guest, response()->json(['message' => 'Guest not found'], 404));
@@ -172,15 +166,8 @@ class GuestApiController extends Controller
     */
    public function delete(DeteleGuestsRequest $request, string $idWedding)
    {
-      $user = $request->user();
-      $id_user = $user->id;
-
       $ids = $request->all()['ids'];
       $wedding = Wedding::with('users', 'tables.users', 'infos')->findOrFail($idWedding);
-
-      if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         abort(response()->json(['message' => 'No tienes permisos para ver esta boda'], 400));
-      }
 
       $countTable = 0;
       foreach ($ids as $id) {
