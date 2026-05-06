@@ -114,7 +114,7 @@ const AppTables = () => {
    const deleteTable = async (table: ITable) => {
       api.delete(`tables/${id}/${table.id}`)
          .then((result) => {
-            if (result.response === 'success') {
+            if (result.success) {
                setTables(tables.filter(t => t.id !== table.id))
                setGuests([...guests, ...table.guests]) // TODO fix
                setAlertMessage('Mesa eliminada')
