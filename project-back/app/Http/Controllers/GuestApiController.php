@@ -70,7 +70,7 @@ class GuestApiController extends Controller
          $wedding->users()->updateExistingPivot($id_user, ['group' => reFormatGroup($data['group'], $wedding->spouse1, $wedding->spouse2)]);
       }
 
-      return $wedding->users()->where('user_id', $id_user)->get();
+      return ['success' => true];
    }
 
    /**
