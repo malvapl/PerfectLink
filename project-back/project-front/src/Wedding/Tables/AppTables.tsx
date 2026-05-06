@@ -62,7 +62,7 @@ const AppTables = () => {
 
       api.get(`guestGroups/${id}`)
          .then((result) => {
-            setGroups([...result, 'Sin asignar'])
+            setGroups([...result.data, 'Sin asignar'])
          })
          .catch((error) => {
             console.error('Groups not found: ' + error)

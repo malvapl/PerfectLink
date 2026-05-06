@@ -63,7 +63,7 @@ const ConfirmationForm = () => {
 
       api.get(`guestGroups/${id}`)
          .then((result) => {
-            setGroups(result)
+            setGroups(result.data)
             setLoading(false)
          })
          .catch((error) => {
