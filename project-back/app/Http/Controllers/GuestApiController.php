@@ -33,19 +33,14 @@ class GuestApiController extends Controller
    public function guestsNotSeated(string $idWedding)
    {
       $wedding = Wedding::with('users', 'tables.users')->findOrFail($idWedding);
-      $guests = $wedding->users()->withPivot('role_id', 'created_at', 'group', 'plusOne')->where('role_id', 3)->get();
 
-      $tables = Table::where('wedding_id', $idWedding)->get();
-      $seatedGuestIds = [];
-      foreach ($tables as $table) {
-         foreach ($table->users as $user) {
-            $seatedGuestIds[] = $user->id;
-         }
-      }
+      $seatedGuestIds = $wedding->tables->flatMap(fn($table) => $table->users->pluck('id'));
 
-      $notSeatedGuests = $guests->filter(function ($guest) use ($seatedGuestIds) {
-         return !in_array($guest->id, $seatedGuestIds);
-      });
+      $notSeatedGuests = $wedding->users()
+         ->withPivot('role_id', 'created_at', 'group', 'plusOne')
+         ->where('role_id', 3)
+         ->whereNotIn('users.id', $seatedGuestIds)
+         ->get();
 
       return GuestResource::customResourceTables($notSeatedGuests, $wedding->spouse1, $wedding->spouse2); //?
    }
