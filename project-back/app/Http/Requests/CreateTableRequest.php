@@ -7,11 +7,13 @@ use Illuminate\Foundation\Http\FormRequest;
 class CreateTableRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Admin or wedding organizer
      */
     public function authorize(): bool
     {
-        return true;
+        $weddingId = $this->route('wedding');
+
+        return $this->user()->hasOwnWedding() == $weddingId;
     }
 
     /**
