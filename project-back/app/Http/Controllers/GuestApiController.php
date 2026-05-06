@@ -5,11 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ConfirmationRequest;
 use App\Http\Requests\DeteleGuestsRequest;
 use App\Http\Resources\GuestResource;
-use App\Models\Table;
+use App\Http\Resources\GuestTableResource;
 use App\Models\User;
 use App\Models\Wedding;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\DB;
 
 class GuestApiController extends Controller
@@ -24,7 +23,7 @@ class GuestApiController extends Controller
       $guests = $wedding->users()->withPivot('role_id', 'created_at', 'plusOne', 'infoMenu', 'suggestion', 'group')
          ->whereIn('role_id', [2, 3, 4])->get();
 
-      return new ResourceCollection(GuestResource::customCollection($guests, $wedding->spouse1, $wedding->spouse2));
+      return GuestResource::collectionWithWedding($guests, $wedding);
    }
 
    /**
@@ -42,7 +41,7 @@ class GuestApiController extends Controller
          ->whereNotIn('users.id', $seatedGuestIds)
          ->get();
 
-      return GuestResource::customResourceTables($notSeatedGuests, $wedding->spouse1, $wedding->spouse2); //?
+      return GuestTableResource::collectionWithWedding($notSeatedGuests, $wedding);
    }
 
    public function confirmInvite(ConfirmationRequest $request, int $idWedding)
@@ -158,7 +157,7 @@ class GuestApiController extends Controller
       $guest = $wedding->users()->withPivot('role_id', 'created_at', 'plusOne', 'infoMenu', 'suggestion', 'group')
          ->where('user_id', $idGuest)->first();
 
-      return GuestResource::customResource($guest, $wedding->spouse1, $wedding->spouse2);
+      return new GuestResource($guest, $wedding);
    }
 
    /**
