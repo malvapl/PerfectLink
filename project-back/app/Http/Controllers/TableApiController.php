@@ -15,7 +15,7 @@ class TableApiController extends Controller
    public function indexTables(Wedding $wedding)
    {
       $tables = $wedding->tables()->with('users')->get();
-      return TableResource::customResource($tables, $wedding);
+      return TableResource::collectionWithWedding($tables, $wedding);
    }
 
    public function storeTable(CreateTableRequest $request, string $idWedding)
