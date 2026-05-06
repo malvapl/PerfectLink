@@ -68,14 +68,7 @@ class WeddingApiController extends Controller
     */
    public function getInfo(string $idWedding, Request $request)
    {
-      $user = $request->user();
-      $id_user = $user->id;
-
       $wedding = Wedding::with('users', 'tables.users', 'infos')->findOrFail($idWedding);
-
-      if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         abort(response()->json(['message' => 'No tienes permisos para ver esta boda'], 400));
-      }
 
       return new ResourceCollection(InfoResource::collection($wedding->infos()->get()));
    }
@@ -87,8 +80,6 @@ class WeddingApiController extends Controller
    {
       $user = $request->user();
       $id_user = $user->id;
-
-      abort_if($user->hasOwnWedding() !== 0, response()->json(['message' => 'Ya estás organizando una boda'], 400));
 
       $data = $request->all();
       do {
@@ -151,15 +142,8 @@ class WeddingApiController extends Controller
 
    public function update(WeddingUpdateRequest $request, string $idWedding)
    {
-      $user = $request->user();
-      $id_user = $user->id;
-
-      $wedding = $user->weddings()->withPivot('role_id')->where('wedding_id', $idWedding)->first();
+      $wedding = $request->user()->weddings()->withPivot('role_id')->where('wedding_id', $idWedding)->first();
       abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
-
-      if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400)); // TODO handle with policies
-      }
 
       $data = $request->all();
 
@@ -175,15 +159,6 @@ class WeddingApiController extends Controller
 
    public function updateBus(CreateBusWeddingRequest $request, string $idWedding)
    {
-      $user = $request->user();
-      $id_user = $user->id;
-
-      $wedding = Wedding::with('buses')->find($idWedding);
-
-      if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400));
-      }
-
       $data = $request->all();
 
       if ($data['deleted']) {
@@ -206,15 +181,6 @@ class WeddingApiController extends Controller
 
    public function addBus(CreateBusWeddingRequest $request, string $idWedding)
    {
-      $user = $request->user();
-      $id_user = $user->id;
-
-      $wedding = Wedding::with('buses')->find($idWedding);
-
-      if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400));
-      }
-
       $data = $request->all();
 
       $data['wedding_id'] = $idWedding;
@@ -225,34 +191,18 @@ class WeddingApiController extends Controller
 
    public function updatePrewedding(UpdatePreweddingRequest $request, string $idWedding)
    {
-      $user = $request->user();
-      $id_user = $user->id;
-
-      $wedding = Wedding::with('prewedding')->find($idWedding);
-
-      if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400));
-      }
-
       $data = $request->all();
 
       $pw = Prewedding::where('wedding_id', $idWedding)->first();
       $pw->location = $data['location'];
       $pw->time = $data['time'];
-      return ['success' => (bool) $pw->save()];
 
+      return ['success' => (bool) $pw->save()];
    }
 
    public function cancelPrewedding(Request $request, string $idWedding)
    {
-      $user = $request->user();
-      $id_user = $user->id;
-
       $wedding = Wedding::find($idWedding);
-
-      if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400));
-      }
 
       $wedding['prewedding'] = false;
       $wedding->save();
@@ -267,14 +217,7 @@ class WeddingApiController extends Controller
     */
    public function cancelBuses(Request $request, string $idWedding)
    {
-      $user = $request->user();
-      $id_user = $user->id;
-
       $wedding = Wedding::find($idWedding);
-
-      if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400));
-      }
 
       $wedding['bus'] = false;
       $wedding->save();
@@ -294,14 +237,6 @@ class WeddingApiController extends Controller
     */
    public function addInfoCards(CreateInfoWeddingRequest $request, string $idWedding)
    {
-      $user = $request->user();
-      $id_user = $user->id;
-
-      $wedding = Wedding::with('infos')->find($idWedding);
-      if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400));
-      }
-
       $data = $request->all();
 
       if (isset($data['subtitle']) && $data['subtitle'] == 'delete' && isset($data['id'])) {
@@ -325,14 +260,6 @@ class WeddingApiController extends Controller
 
    public function addInfoCard(CreateInfoWeddingRequest $request, string $idWedding)
    {
-      $user = $request->user();
-      $id_user = $user->id;
-
-      $wedding = Wedding::with('infos')->find($idWedding);
-      if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400));
-      }
-
       $data = $request->all();
 
       $data['wedding_id'] = $idWedding;
@@ -343,13 +270,7 @@ class WeddingApiController extends Controller
 
    public function destroy(Request $request, string $idWedding)
    {
-      $user = $request->user();
-      $id_user = $user->id;
-
       $wedding = Wedding::find($idWedding);
-      if (!$user->is_admin && $wedding->users()->withPivot('role_id')->where('role_id', 1)->where('user_id', $id_user)->count() === 0) {
-         abort(response()->json(['message' => 'No tienes permisos para modificar esta boda'], 400));
-      }
 
       return ['success' => (bool) $wedding->delete()];
    }
