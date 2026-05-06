@@ -17,9 +17,9 @@ class GuestApiController extends Controller
    /**
     * Return the guests of the specified wedding, along with the spouses
     */
-   public function index(string $idWedding)
+   public function index(Wedding $wedding)
    {
-      $wedding = Wedding::with('users')->findOrFail($idWedding);
+      $wedding->load('users');
       $guests = $wedding->users()->withPivot('role_id', 'created_at', 'plusOne', 'infoMenu', 'suggestion', 'group')
          ->whereIn('role_id', [2, 3, 4])->get();
 
@@ -29,9 +29,9 @@ class GuestApiController extends Controller
    /**
     * Return the CONFIRMED guests of the specified wedding that have not been assigned a table yet
     */
-   public function guestsNotSeated(string $idWedding)
+   public function guestsNotSeated(Wedding $wedding)
    {
-      $wedding = Wedding::with('users', 'tables.users')->findOrFail($idWedding);
+      $wedding->load('users', 'tables.users');
 
       $seatedGuestIds = $wedding->tables->flatMap(fn($table) => $table->users->pluck('id'));
 
@@ -95,9 +95,9 @@ class GuestApiController extends Controller
    /**
     * Calculate total of guests in the fields abilidated (bus, prewedding, confirmed)
     */
-   public function dataGuests(string $idWedding, Request $request)
+   public function dataGuests(Wedding $wedding, Request $request)
    {
-      $wedding = Wedding::with('users', 'buses', 'prewedding')->findOrFail($idWedding);
+      $wedding->load('users', 'buses', 'prewedding');
       abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
 
       $totalConfirmed = $wedding->users()->withPivot('role_id')->where('role_id', 3)->count();
@@ -118,9 +118,8 @@ class GuestApiController extends Controller
    /**
     * Get guest groups by wedding
     */
-   public function guestGroups(Request $request, string $idWedding)
+   public function guestGroups(Request $request, Wedding $wedding)
    {
-      $wedding = Wedding::findOrFail($idWedding);
       abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
 
       $type = DB::select('SHOW COLUMNS FROM user_wedding WHERE Field = "group"')[0]->Type;
@@ -139,9 +138,9 @@ class GuestApiController extends Controller
    /**
     * Update guest group in wedding
     */
-   public function updateGroup(Request $request, string $idWedding, string $idGuest)
+   public function updateGroup(Request $request, Wedding $wedding, string $idGuest)
    {
-      $wedding = Wedding::with('users')->findOrFail($idWedding);
+      $wedding->load('users');
 
       $guest = $wedding->users()->where('user_id', $idGuest)->first();
       abort_if(!$guest, response()->json(['message' => 'Guest not found'], 404));
@@ -163,10 +162,10 @@ class GuestApiController extends Controller
    /**
     * Remove guests from wedding
     */
-   public function delete(DeteleGuestsRequest $request, string $idWedding)
+   public function delete(DeteleGuestsRequest $request, Wedding $wedding)
    {
       $ids = $request->all()['ids'];
-      $wedding = Wedding::with('users', 'tables.users', 'infos')->findOrFail($idWedding);
+      $wedding->load('users', 'tables.users', 'infos');
 
       $countTable = 0;
       foreach ($ids as $id) {

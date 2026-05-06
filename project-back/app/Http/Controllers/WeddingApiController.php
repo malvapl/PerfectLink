@@ -57,18 +57,18 @@ class WeddingApiController extends Controller
    /**
     * Get all wedding data
     */
-   public function show(string $idWedding)
+   public function show(Wedding $wedding)
    {
-      $wedding = Wedding::with('users', 'tables.users', 'infos')->findOrFail($idWedding);
+      $wedding->load('users', 'tables.users', 'infos');
       return new WeddingDetailResource($wedding);
    }
 
    /**
     * Get wedding info
     */
-   public function getInfo(string $idWedding, Request $request)
+   public function getInfo(Wedding $wedding, Request $request)
    {
-      $wedding = Wedding::with('users', 'tables.users', 'infos')->findOrFail($idWedding);
+      $wedding->load('users', 'tables.users', 'infos');
 
       return new ResourceCollection(InfoResource::collection($wedding->infos()->get()));
    }
@@ -118,23 +118,23 @@ class WeddingApiController extends Controller
       return ['id' => (int) $wedding->id];
    }
 
-   public function getBuses(string $idWedding, Request $request)
+   public function getBuses(Wedding $wedding, Request $request)
    {
-      $wedding = Wedding::with('users', 'tables.users', 'infos')->findOrFail($idWedding);
+      $wedding->load('users', 'tables.users', 'infos');
       abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
       abort_if(!$wedding->bus, response()->json(['message' => 'Buses not found'], 404));
 
-      $buses = Bus::where('wedding_id', $idWedding)->get();
+      $buses = Bus::where('wedding_id', $wedding->id)->get();
 
       return new ResourceCollection(BusResource::collection($buses));
    }
 
-   public function getPrewedding(string $idWedding, Request $request)
+   public function getPrewedding(Wedding $wedding, Request $request)
    {
-      $wedding = Wedding::with('users', 'tables.users', 'infos')->findOrFail($idWedding);
+      $wedding->load('users', 'tables.users', 'infos');
       abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
 
-      $pw = Prewedding::where('wedding_id', $idWedding)->first();
+      $pw = Prewedding::where('wedding_id', $wedding->id)->first();
       abort_if(!$pw, response()->json(['message' => 'Prewedding not found'], 404));
 
       return new PreweddingResource($pw);
@@ -200,14 +200,12 @@ class WeddingApiController extends Controller
       return ['success' => (bool) $pw->save()];
    }
 
-   public function cancelPrewedding(Request $request, string $idWedding)
+   public function cancelPrewedding(Request $request, Wedding $wedding)
    {
-      $wedding = Wedding::find($idWedding);
-
       $wedding['prewedding'] = false;
       $wedding->save();
 
-      $pw = Prewedding::where('wedding_id', $idWedding)->first();
+      $pw = Prewedding::where('wedding_id', $wedding->id)->first();
 
       return ['success' => (bool) $pw->delete()];
    }
@@ -215,14 +213,12 @@ class WeddingApiController extends Controller
    /**
     * Delete wedding buses
     */
-   public function cancelBuses(Request $request, string $idWedding)
+   public function cancelBuses(Request $request, Wedding $wedding)
    {
-      $wedding = Wedding::find($idWedding);
-
       $wedding['bus'] = false;
       $wedding->save();
 
-      $buses = Bus::where('wedding_id', $idWedding)->get();
+      $buses = Bus::where('wedding_id', $wedding->id)->get();
 
       $result = true;
       foreach ($buses as $bus) {
@@ -268,10 +264,8 @@ class WeddingApiController extends Controller
       return new InfoResource($info);
    }
 
-   public function destroy(Request $request, string $idWedding)
+   public function destroy(Request $request, Wedding $wedding)
    {
-      $wedding = Wedding::find($idWedding);
-
       return ['success' => (bool) $wedding->delete()];
    }
 }
