@@ -2,14 +2,21 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Wedding;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Collection;
 
 class TableResource extends JsonResource
 {
 
-    private static $users;
+    public function __construct(
+        $resource,
+        private ?Wedding $wedding = null,
+        private ?Collection $weddingGuests = null
+    ) {
+        parent::__construct($resource);
+    }
 
     public function toArray(Request $request): array
     {
@@ -17,35 +24,20 @@ class TableResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'maxChairs' => $this->maxChairs,
-            'guests' => self::$users,
             'pos_x' => $this->pos_x,
             'pos_y' => $this->pos_y,
+            'guests' => $this->whenLoaded('users', function () {
+                return $this->users->map(
+                    fn($user) => new TableGuestResource($user, $this->wedding, $this->weddingGuests)
+                );
+            }),
         ];
     }
 
-    public static function toArrayCustom($request): array
+    public static function collectionWithWedding($tables, Wedding $wedding)
     {
-        return [
-            'id' => $request->id,
-            'name' => $request->name,
-            'maxChairs' => $request->maxChairs,
-            'guests' => self::$users,
-            'pos_x' => $request->pos_x,
-            'pos_y' => $request->pos_y,
-        ];
-    }
-
-    public static function customResource($resource, $wedding): array
-    {
-        $result = [];
-        foreach ($resource as $table){
-            self::$users = TableGuestResource::customResource(
-                $table->users()->withPivot('numSeat', 'plusOne')->get(),
-                $wedding
-            );
-            // self::$users = $table->users()->get();
-            $result[] = self::toArrayCustom($table);
-        }
-        return $result;
+        return static::collection(
+            $tables->map(fn($table) => new static($table, $wedding))
+        );
     }
 }

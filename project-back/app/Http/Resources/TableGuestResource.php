@@ -2,54 +2,35 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Wedding;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Collection;
 
 class TableGuestResource extends JsonResource
 {
 
-   private static $wedding;
-   private static $plusOne;
-   private static $group;
+   public function __construct(
+      $resource,
+      private ?Wedding $wedding = null,
+      private ?Collection $weddingGuests = null
+   ) {
+      parent::__construct($resource);
+   }
 
    public function toArray(Request $request): array
    {
+      $weddingPivot = $this->weddingGuests?->get($this->id)?->pivot;
+
       return [
          'id' => $this->id,
-         'name' => ($this->name . " " .  $this->lastname),
-         // 'numSeat' => self::$numSeat,
-         'numSeat' => $request->pivot->numSeat,
-         'group' => formatGroup($this->pivot->group, self::$wedding->spouse1, self::$wedding->spouse2),
-         'plusOne' => $this->pivot->plusOne,
+         'name' => $this->name . ' ' . $this->lastname,
+         'numSeat' => $this->pivot->numSeat,
+         'isPlusOne' => $this->pivot->plusOne,
+         'group' => $weddingPivot
+            ? formatGroup($weddingPivot->group, $this->wedding->spouse1, $this->wedding->spouse2)
+            : null,
+         'plusOne' => $weddingPivot?->plusOne,
       ];
-   }
-
-   public static function toArrayCustom($request): array
-   {
-      return [
-         'id' => $request->id,
-         'name' => ($request->name . " " .  $request->lastname),
-         'numSeat' => $request->pivot->numSeat,
-         'isPlusOne' => $request->pivot->plusOne,
-         'group' => formatGroup(self::$group, self::$wedding->spouse1, self::$wedding->spouse2),
-         'plusOne' => self::$plusOne,
-      ];
-   }
-
-   public static function customResource($resource, $wedding): array
-   {
-      self::$wedding = $wedding;
-      $result = [];
-      foreach ($resource as $guest) {
-         $weddingGuest = $wedding->users()->withPivot('role_id', 'plusOne', 'group')->where('user_id', $guest->id)->get();
-         self::$group = $weddingGuest->first()->pivot->group;
-         self::$plusOne = $weddingGuest->first()->pivot->plusOne;
-         // self::$numSeat = $allGuests->where('user_id', $id);
-         $result[] = self::toArrayCustom($guest);
-      }
-      // return $resource[0];
-      // $table = $resource->tables()->where('user_id', $resource->id)->first();
-      // self::$numSeat = $table;
-      return $result;
    }
 }
