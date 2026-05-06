@@ -55,8 +55,10 @@ class TableApiController extends Controller
       return ['success' => true];
    }
 
-   public function destroyTable(Request $request, Wedding $wedding, string $idTable)
+   public function destroyTable(Request $request, Wedding $wedding, Table $table)
    {
-      return ['success' => (bool) $wedding->tables()->find($idTable)->delete()];
+      $this->authorize('delete', $table);
+
+      return ['success' => (bool) $table->delete()];
    }
 }
