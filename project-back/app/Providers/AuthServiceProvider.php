@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Table;
+use App\Models\Wedding;
+use App\Policies\TablePolicy;
+use App\Policies\WeddingPolicy;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
@@ -13,7 +17,8 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        // 'App\Models\Model' => 'App\Policies\ModelPolicy',
+        Table::class => TablePolicy::class,
+        Wedding::class => WeddingPolicy::class
     ];
 
     /**
