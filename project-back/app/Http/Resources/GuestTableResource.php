@@ -5,8 +5,9 @@ namespace App\Http\Resources;
 use App\Models\Wedding;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-class GuestResource extends JsonResource
+class GuestTableResource extends JsonResource
 {
     public function __construct(
         $resource,
@@ -19,20 +20,13 @@ class GuestResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'lastname' => $this->lastname,
-            'role' => $this->pivot->role_id,
-            'joined_at' => $this->pivot->created_at->format('d-m-Y'),
-            'bus' => $this->pivot->bus,
-            'prewedding' => $this->pivot->prewedding,
+            'name' => $this->name . ' ' . $this->lastname,
             'group' => formatGroup($this->pivot->group, $this->wedding?->spouse1, $this->wedding?->spouse2),
             'plusOne' => $this->pivot->plusOne,
-            'infoMenu' => $this->pivot->infoMenu,
-            'suggestion' => $this->pivot->suggestion,
         ];
     }
 
-    public static function collectionWithWedding($guests, Wedding $wedding)
+    public static function collectionWithWedding($guests, Wedding $wedding): AnonymousResourceCollection
     {
         return static::collection(
             $guests->map(fn($guest) => new static($guest, $wedding))
