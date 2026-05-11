@@ -23,14 +23,17 @@ export interface IPopoverSeat {
    plusOne?: string | null
 }
 
+type AlertState = {
+   open: boolean;
+   variant: 'error' | 'info' | 'success' | 'warning';
+   message: string;
+}
 
 const AppTables = () => {
 
    const api = useApi();
    const [loading, setLoading] = useState<boolean>(false);
-   const [showAlert, setShowAlert] = useState(false);
-   const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
-   const [alertMessage, setAlertMessage] = useState('');
+   const [alert, setAlert] = useState<AlertState>({ open: false, variant: 'info', message: '' });
 
    const [guests, setGuests] = useState<IGuest[]>([])
    const [groups, setGroups] = useState<string[]>([])
@@ -84,14 +87,10 @@ const AppTables = () => {
       tables.forEach(table => {
          api.patch(`updateTables/${table.id}`, table)
             .then((result) => {
-               setAlertMessage('Datos actualizados')
-               setAlertVariant('success')
-               setShowAlert(true)
+               setAlert({ open: true, variant: 'success', message: 'Datos actualizados' })
             })
             .catch((error) => {
-               setShowAlert(true);
-               setAlertMessage('No se ha podido actualizar: ' + error)
-               setAlertVariant('error')
+               setAlert({ open: true, variant: 'error', message: 'No se ha podido actualizar: ' + error })
             })
       })
    }
@@ -100,14 +99,10 @@ const AppTables = () => {
       api.post(`tables/${id}`, table)
          .then((result) => {
             setTables([...tables, { ...result.data, guests: [] }])
-            setAlertMessage('Mesa creada')
-            setAlertVariant('success')
-            setShowAlert(true)
+            setAlert({ open: true, variant: 'success', message: 'Mesa creada' })
          })
          .catch((error) => {
-            setShowAlert(true);
-            setAlertMessage('No se ha podido crear la mesa: ' + error)
-            setAlertVariant('error')
+            setAlert({ open: true, variant: 'error', message: 'No se ha podido crear la mesa: ' + error })
          })
    }
 
@@ -117,15 +112,11 @@ const AppTables = () => {
             if (result.success) {
                setTables(tables.filter(t => t.id !== table.id))
                setGuests([...guests, ...table.guests]) // TODO fix
-               setAlertMessage('Mesa eliminada')
-               setAlertVariant('success')
-               setShowAlert(true)
+               setAlert({ open: true, variant: 'success', message: 'Mesa eliminada' })
             }
          })
          .catch((error) => {
-            setShowAlert(true);
-            setAlertMessage('No se ha podido eliminar la mesa: ' + error)
-            setAlertVariant('error')
+            setAlert({ open: true, variant: 'error', message: 'No se ha podido eliminar la mesa: ' + error })
          })
    }
 
@@ -179,11 +170,9 @@ const AppTables = () => {
 
    const handlePlaceGuest = (newGuest: IGuest) => {
       if (guest !== undefined) {
-         setAlertMessage('Elige un sitio para ' + guest.name + ' o devuélvelo a la lista haciendo doble click')
-         setAlertVariant('info')
-         setShowAlert(true)
+         setAlert({ open: true, variant: 'info', message: 'Elige un sitio para ' + guest.name + ' o devuélvelo a la lista haciendo doble click' })
          setInterval(() => {
-            setShowAlert(false)
+            setAlert((prev) => ({ ...prev, open: false }))
          }, 10000)
          return;
       }
@@ -211,9 +200,7 @@ const AppTables = () => {
                   setGuest(undefined)
                   updateTable({ ...table, guests: [...table.guests, { ...newGuest, numSeat: seat, isPlusOne: false }] })
                } else {
-                  setAlertMessage('No hay asientos disponibles en esta mesa')
-                  setAlertVariant('error')
-                  setShowAlert(true)
+                  setAlert({ open: true, variant: 'error', message: 'No hay asientos disponibles en esta mesa' })
                }
             } else {
                const bothSeats = findTwoSeats(table)
@@ -225,9 +212,7 @@ const AppTables = () => {
                   setGuest(undefined)
                   updateTable({ ...table, guests: [...table.guests, ...newGuests] })
                } else {
-                  setAlertMessage('No hay asientos disponibles en esta mesa')
-                  setAlertVariant('error')
-                  setShowAlert(true)
+                  setAlert({ open: true, variant: 'error', message: 'No hay asientos disponibles en esta mesa' })
                }
             }
          }
@@ -270,8 +255,11 @@ const AppTables = () => {
                size={30}
             />
          ) : (<>
-            <Message showAlert={showAlert} color={alertVariant} message={alertMessage}
-               setShowAlert={setShowAlert}
+            <Message 
+               showAlert={alert.open} 
+               color={alert.variant} 
+               message={alert.message}
+               setShowAlert={(open) => setAlert((prev) => ({ ...prev, open }))}
             />
 
             <ListGuests

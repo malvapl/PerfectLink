@@ -14,15 +14,24 @@ type ExtraData = {
    bus: number | string;
    prewedding: number | string;
 }
+
+type AlertState = {
+  open: boolean
+  variant: 'error' | 'info' | 'success' | 'warning'
+  message: string
+}
+
 const AppGuests = () => {
 
    const api = useApi();
    const navigate = useNavigate()
    const { id } = useParams()
    const [loading, setLoading] = useState<boolean>(false);
-   const [showAlert, setShowAlert] = useState(false);
-   const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
-   const [alertMessage, setAlertMessage] = useState('');
+   const [alert, setAlert] = useState<AlertState>({
+      open: false,
+      variant: 'info',
+      message: ''
+   })
    const [openConfirmation, setOpenConfirmation] = useState(false)
 
    const [guests, setGuests] = useState<Guest[]>([])
@@ -90,9 +99,7 @@ const AppGuests = () => {
       api.post(`removeGuests/${id}`, idUser ? { ids: [idUser] } : { ids })
          .then((result) => {
             setIds([])
-            setAlertMessage('Invitaciones canceladas')
-            setAlertVariant('success')
-            setShowAlert(true)
+            setAlert({ open: true, variant: 'success', message: 'Invitaciones canceladas' })
             if (idUser) {
                setGuests(guests.filter((g) => g.id !== idUser))
             } else {
@@ -100,24 +107,18 @@ const AppGuests = () => {
             }
          })
          .catch((error) => {
-            setShowAlert(true);
-            setAlertMessage('Ha ocurrido un error: ' + error)
-            setAlertVariant('error')
+            setAlert({ open: true, variant: 'error', message: 'Ha ocurrido un error: ' + error })
          })
    }
 
    const updateGroup = async (guest: Guest) => {
       api.post(`updateGroup/${id}/${guest.id}`, { group: guest.group || null })
          .then((result) => {
-            setAlertMessage('Grupo actualizado')
-            setAlertVariant('success')
-            setShowAlert(true)
+            setAlert({ open: true, variant: 'success', message: 'Grupo actualizado' })
             setGuests(guests.map((guest) => guest.id === result.id ? result : guest))
          })
          .catch((error) => {
-            setShowAlert(true);
-            setAlertMessage('Ha ocurrido un error: ' + error)
-            setAlertVariant('error')
+            setAlert({ open: true, variant: 'error', message: 'Ha ocurrido un error: ' + error })
          })
    }
 
@@ -135,8 +136,11 @@ const AppGuests = () => {
             size={30}
          /> : (<>
 
-            <Message showAlert={showAlert} color={alertVariant} message={alertMessage}
-               setShowAlert={setShowAlert}
+            <Message 
+               showAlert={alert.open}
+               color={alert.variant}
+               message={alert.message}
+               setShowAlert={(open) => setAlert((prev) => ({ ...prev, open }))}
             />
 
             <Container maxWidth={'lg'} sx={{

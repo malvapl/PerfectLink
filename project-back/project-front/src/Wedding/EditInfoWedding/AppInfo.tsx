@@ -33,12 +33,19 @@ export interface InfoExtra {
    wedding_id: number
 }
 
+type AlertState = {
+   open: boolean;
+   variant: 'error' | 'info' | 'success' | 'warning';
+   message: string;
+}
+
 const AppInfo = () => {
 
    const api = useApi();
-   const [showAlert, setShowAlert] = useState(false);
-   const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
-   const [alertMessage, setAlertMessage] = useState('');
+   const [alert, setAlert] = useState<AlertState>({ open: false, variant: 'info', message: '' });
+   const setShowAlert = (open: boolean) => setAlert((prev) => ({ ...prev, open }));
+   const setAlertVariant = (variant: 'error' | 'info' | 'success' | 'warning') => setAlert((prev) => ({ ...prev, variant }));
+   const setAlertMessage = (message: string) => setAlert((prev) => ({ ...prev, message }));
 
    const navigate = useNavigate();
    const { id } = useParams();
@@ -141,7 +148,10 @@ const AppInfo = () => {
                   size={30}
                />
             ) : (<>
-               <Message showAlert={showAlert} color={alertVariant} message={alertMessage}
+               <Message 
+                  showAlert={alert.open} 
+                  color={alert.variant} 
+                  message={alert.message}
                   setShowAlert={setShowAlert}
                />
 

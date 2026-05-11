@@ -6,6 +6,12 @@ import Message from '../Message';
 import SpinnerForm from '../SpinnerForm';
 import { useApi } from '../hooks/useApi';
 
+type AlertState = {
+   open: boolean;
+   variant: 'error' | 'info' | 'success' | 'warning';
+   message: string;
+}
+
 const JoinSection = (props: {
    message: string, role: string,
    setDialog: (a: { open: boolean, action: 'join' | 'create' | '' }) => void
@@ -18,9 +24,7 @@ const JoinSection = (props: {
    const [code, setCode] = useState('');
    const [btnDisabled, setBtnDisabled] = useState(true);
    const [showAlert, setShowAlert] = useState(false)
-   const [showAlertSuccess, setShowAlertSuccess] = useState(false);
-   const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
-   const [alertMessage, setAlertMessage] = useState('');
+   const [alert, setAlert] = useState<AlertState>({ open: false, variant: 'info', message: '' });
    const [loading, setLoading] = useState(false)
 
    const joinUser = async (code: string, id: string) => {
@@ -30,24 +34,18 @@ const JoinSection = (props: {
             console.log(result)
             if (result.error) {
                setLoading(false);
-               setAlertMessage(result.error);
-               setAlertVariant('error');
-               setShowAlertSuccess(true)
+               setAlert({ open: true, variant: 'error', message: result.error });
             } else {
                window.dispatchEvent(new StorageEvent('storage'));
                setTimeout(() => {
                   navigate('/wedding/' + id);
                }, 3000);
-               setAlertMessage('Uniéndose a la boda...');
-               setAlertVariant('success');
-               setShowAlertSuccess(true);
+               setAlert({ open: true, variant: 'success', message: 'Uniéndose a la boda...' });
             }
          })
          .catch((error) => {
             setLoading(false);
-            setAlertMessage('Error');
-            setAlertVariant('error');
-            setShowAlertSuccess(true)
+            setAlert({ open: true, variant: 'error', message: 'Error' });
          })
    };
 
@@ -83,10 +81,10 @@ const JoinSection = (props: {
 
    return (<>
       <Message
-         showAlert={showAlertSuccess}
-         color={alertVariant}
-         message={alertMessage}
-         setShowAlert={setShowAlertSuccess}
+         showAlert={alert.open}
+         color={alert.variant}
+         message={alert.message}
+         setShowAlert={(open) => setAlert((prev) => ({ ...prev, open }))}
       />
       <Snackbar
          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}

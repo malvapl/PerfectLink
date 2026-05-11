@@ -19,14 +19,18 @@ export interface IWedding {
 }
 
 
+type AlertState = {
+   open: boolean;
+   variant: 'error' | 'info' | 'success' | 'warning';
+   message: string;
+}
+
 const ListWeddings = () => {
 
    const api = useApi();
    const navigate = useNavigate()
    const [loading, setLoading] = useState<boolean>(false);
-   const [showAlert, setShowAlert] = useState(false);
-   const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
-   const [alertMessage, setAlertMessage] = useState('');
+   const [alert, setAlert] = useState<AlertState>({ open: false, variant: 'info', message: '' });
 
    const [weddings, setWeddings] = useState<IWedding[]>([])
 
@@ -61,14 +65,10 @@ const ListWeddings = () => {
             setWeddings(weddings.filter(w => w.id !== weddingId))
             localStorage.removeItem('hasOwnWedding');
             window.dispatchEvent(new Event('storage'));
-            setAlertMessage('Boda eliminada')
-            setAlertVariant('success')
-            setShowAlert(true)
+            setAlert({ open: true, variant: 'success', message: 'Boda eliminada' })
          })
          .catch((error) => {
-            setShowAlert(true);
-            setAlertMessage('Ha ocurrido un error: ' + error)
-            setAlertVariant('error')
+            setAlert({ open: true, variant: 'error', message: 'Ha ocurrido un error: ' + error })
          })
    }
 
@@ -99,8 +99,11 @@ const ListWeddings = () => {
             size={30}
          /> : (<>
 
-            <Message showAlert={showAlert} color={alertVariant} message={alertMessage}
-               setShowAlert={setShowAlert}
+            <Message 
+               showAlert={alert.open} 
+               color={alert.variant} 
+               message={alert.message}
+               setShowAlert={(open) => setAlert((prev) => ({ ...prev, open }))}
             />
 
             <Container maxWidth={'md'} sx={{

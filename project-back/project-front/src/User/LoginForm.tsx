@@ -14,14 +14,17 @@ type FormValues = {
     password: string
 }
 
+type AlertState = {
+    open: boolean
+    variant: 'error' | 'info' | 'success' | 'warning'
+    message: string
+}
 
 function LoginForm(props: { dialogLogin?: (open: boolean, action: 'join' | 'create' | '') => void, action?: 'join' | 'create' | '' }) {
 
     const api = useApi();
     const navigate = useNavigate();
-    const [showAlert, setShowAlert] = useState(false);
-    const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
-    const [alertMessage, setAlertMessage] = useState('');
+    const [alert, setAlert] = useState<AlertState>({ open: false, variant: 'info', message: '' });
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
@@ -52,23 +55,19 @@ function LoginForm(props: { dialogLogin?: (open: boolean, action: 'join' | 'crea
                 if (result.wedding) {
                     localStorage.setItem('hasOwnWedding', JSON.stringify(result.wedding));
                 }
-                setAlertVariant('success');
-                setAlertMessage('Usuario logeado');
+
                 if (props.dialogLogin) {
-                    setShowAlert(true);
+                    setAlert({ open: true, variant: 'success', message: 'Usuario logeado' });
                     setTimeout(() => {
                         window.dispatchEvent(new Event('storage'));
                         props.dialogLogin!(true, props.action!)
                     }, 3000);
                 } else {
-                    setShowAlert(true);
                     setTimeout(redirigir, 3000);
                 }
             })
             .catch((error) => {
-                setAlertMessage('Usuario o contraseña incorrecta. Vuelve a intentarlo');
-                setAlertVariant('error');
-                setShowAlert(true);
+                setAlert({ open: true, variant: 'error', message: 'Usuario o contraseña incorrecta. Vuelve a intentarlo' });
                 setLoading(false)
                 reset();                
             })
@@ -76,8 +75,11 @@ function LoginForm(props: { dialogLogin?: (open: boolean, action: 'join' | 'crea
 
     return (
         <div>
-            <Message showAlert={showAlert} color={alertVariant} message={alertMessage}
-                setShowAlert={setShowAlert}
+            <Message 
+                showAlert={alert.open} 
+                color={alert.variant} 
+                message={alert.message}
+                setShowAlert={(open) => setAlert((prev) => ({ ...prev, open }))}
             />
 
             <Container maxWidth="sm" sx={{

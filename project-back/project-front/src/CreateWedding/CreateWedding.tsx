@@ -26,15 +26,19 @@ type FormValues = {
    bus: number
 }
 
+type AlertState = {
+   open: boolean;
+   variant: 'error' | 'info' | 'success' | 'warning';
+   message: string;
+}
+
 const CreateWedding = () => {
 
    const api = useApi();
    const navigate = useNavigate();
 
    const [loading, setLoading] = useState(false);
-   const [showAlert, setShowAlert] = useState(false);
-   const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
-   const [alertMessage, setAlertMessage] = useState('');
+   const [alert, setAlert] = useState<AlertState>({ open: false, variant: 'info', message: '' });
    const [helperPrewedding, setHelperPrewedding] = useState(false)
    const [helperBus, setHelperBus] = useState(false)
 
@@ -65,9 +69,7 @@ const CreateWedding = () => {
       })
          .then((result) => {
             if (result.id) {
-               setAlertMessage('Creando sala de la boda...');
-               setAlertVariant('success');
-               setShowAlert(true);
+               setAlert({ open: true, variant: 'success', message: 'Creando sala de la boda...' });
                localStorage.setItem('hasOwnWedding', JSON.stringify(result.id));
                window.dispatchEvent(new Event('storage'));
                setTimeout(() => {
@@ -76,9 +78,7 @@ const CreateWedding = () => {
             }
          })
          .catch((error) => {
-            setAlertMessage('No se ha podido crear la boda: ' + error);
-            setAlertVariant('error');
-            setShowAlert(true)
+            setAlert({ open: true, variant: 'error', message: 'No se ha podido crear la boda: ' + error });
             setLoading(false)
          })
    }
@@ -87,10 +87,10 @@ const CreateWedding = () => {
    return (
       <>
          <Message
-            showAlert={showAlert}
-            color={alertVariant}
-            message={alertMessage}
-            setShowAlert={setShowAlert}
+            showAlert={alert.open}
+            color={alert.variant}
+            message={alert.message}
+            setShowAlert={(open) => setAlert((prev) => ({ ...prev, open }))}
          />
 
          <Container maxWidth="sm" sx={{

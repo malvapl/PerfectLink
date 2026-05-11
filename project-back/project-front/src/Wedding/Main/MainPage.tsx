@@ -41,12 +41,16 @@ interface Info {
    enabled: boolean;
 }
 
+type AlertState = {
+   open: boolean;
+   variant: 'error' | 'info' | 'success' | 'warning';
+   message: string;
+}
+
 const MainPage = () => {
 
    const api = useApi();
-   const [showAlert, setShowAlert] = useState(false);
-   const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
-   const [alertMessage, setAlertMessage] = useState('');
+   const [alert, setAlert] = useState<AlertState>({ open: false, variant: 'info', message: '' });
 
    const navigate = useNavigate();
    const { id } = useParams();
@@ -153,17 +157,13 @@ const MainPage = () => {
                setTimeout(() => {
                   navigate('/');
                }, 2000);
-               setAlertMessage('Asistencia cancelada');
-               setAlertVariant('success');
-               setShowAlert(true);
+               setAlert({ open: true, variant: 'success', message: 'Asistencia cancelada' });
                setBtnLoading(false);
             }
          })
          .catch((error) => {
             setBtnLoading(false);
-            setAlertMessage('No se ha podido cancelar: ' + error);
-            setAlertVariant('error');
-            setShowAlert(true)
+            setAlert({ open: true, variant: 'error', message: 'No se ha podido cancelar: ' + error });
             setLoading(false)
          })
    }
@@ -181,10 +181,10 @@ const MainPage = () => {
             ) : (<>
 
                <Message
-                  showAlert={showAlert}
-                  color={alertVariant}
-                  message={alertMessage}
-                  setShowAlert={setShowAlert}
+                  showAlert={alert.open}
+                  color={alert.variant}
+                  message={alert.message}
+                  setShowAlert={(open) => setAlert((prev) => ({ ...prev, open }))}
                />
 
                <Container disableGutters maxWidth={'md'} sx={{

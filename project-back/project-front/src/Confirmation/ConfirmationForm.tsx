@@ -18,6 +18,12 @@ type FormValues = {
    group?: string,
 }
 
+type AlertState = {
+   open: boolean;
+   variant: 'error' | 'info' | 'success' | 'warning';
+   message: string;
+}
+
 const ConfirmationForm = () => {
 
    const api = useApi();
@@ -26,9 +32,7 @@ const ConfirmationForm = () => {
 
    const [btnLoading, setBtnLoading] = useState(false);
    const [loading, setLoading] = useState(false);
-   const [showAlert, setShowAlert] = useState(false);
-   const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
-   const [alertMessage, setAlertMessage] = useState('');
+   const [alert, setAlert] = useState<AlertState>({ open: false, variant: 'info', message: '' });
    const [checkPlusOne, setCheckPlusOne] = useState(false)
    const [helperPlusOne, setHelperPlusOne] = useState(false)
    const [btnDisabled, setBtnDisabled] = useState(false)
@@ -79,17 +83,13 @@ const ConfirmationForm = () => {
 
       api.post(`users/confirmInvite/${id}`, sanitizedValues)
          .then((result) => {
-            setAlertMessage('Asistencia confirmada');
-            setAlertVariant('success');
-            setShowAlert(true);
+            setAlert({ open: true, variant: 'success', message: 'Asistencia confirmada' });
             // setInterval(() => {
                navigate('/wedding/' + id)
             // }, 2000)
          })
          .catch((error) => {
-            setAlertMessage('No se ha podido confirmar');
-            setAlertVariant('error');
-            setShowAlert(true)
+            setAlert({ open: true, variant: 'error', message: 'No se ha podido confirmar' });
             setBtnLoading(false)
          })
    }
@@ -97,10 +97,10 @@ const ConfirmationForm = () => {
 
    return (<>
       <Message
-         showAlert={showAlert}
-         color={alertVariant}
-         message={alertMessage}
-         setShowAlert={setShowAlert}
+         showAlert={alert.open}
+         color={alert.variant}
+         message={alert.message}
+         setShowAlert={(open) => setAlert((prev) => ({ ...prev, open }))}
       />
 
       <Container maxWidth="sm" sx={{

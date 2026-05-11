@@ -17,6 +17,12 @@ type FormValues = {
   password_confirmation: string
 }
 
+type AlertState = {
+  open: boolean
+  variant: 'error' | 'info' | 'success' | 'warning'
+  message: string
+}
+
 function Register() {
 
   const api = useApi();
@@ -43,16 +49,13 @@ function Register() {
 
     api.post('register', data)
       .then((result) => {
-          setAlertMessage('Usuario registrado correctamente');
-          setAlertVariant('success');
-          setShowAlert(true);
+          setAlert({ open: true, variant: 'success', message: 'Usuario registrado correctamente' });
           setTimeout(() => {
             navigate('/login')
           }, 3000);
       })
       .catch((error) => {
-          setAlertMessage('No se ha podido registrar el usuario');
-          setAlertVariant('error');
+          setAlert({ open: true, variant: 'error', message: 'No se ha podido registrar el usuario' });
           setLoading(false)
       })
   }
@@ -60,9 +63,7 @@ function Register() {
   const [erroremailDB, setErrorEmailDB] = useState({ color: false, text: '' });
 
   const [loading, setLoading] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertVariant, setAlertVariant] = useState<'error' | 'info' | 'success' | 'warning'>('info');
-  const [alertMessage, setAlertMessage] = useState('');
+  const [alert, setAlert] = useState<AlertState>({ open: false, variant: 'info', message: '' });
   const [showPassword, setShowPassword] = useState({
     showPassword: false,
     showConfPassword: false
@@ -86,8 +87,11 @@ function Register() {
 
   return (
     <div id='containerLoginRegister'>
-      <Message showAlert={showAlert} color={alertVariant} message={alertMessage}
-        setShowAlert={setShowAlert}
+      <Message 
+        showAlert={alert.open} 
+        color={alert.variant} 
+        message={alert.message}
+        setShowAlert={(open) => setAlert((prev) => ({ ...prev, open }))}
       />
 
       <Container className='boxRL' maxWidth="sm" sx={{
