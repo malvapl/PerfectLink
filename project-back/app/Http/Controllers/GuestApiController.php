@@ -108,7 +108,7 @@ class GuestApiController extends Controller
          $totalBus += $wedding->users()->withPivot('bus')->where('bus', 1)->where('plusOne', '!=', null)->count();
       }
 
-      if ($wedding->bus) {
+      if ($wedding->prewedding) {
          $totalPrewedding = $wedding->users()->withPivot('prewedding')->where('prewedding', 1)->count();
          $totalPrewedding += $wedding->users()->withPivot('prewedding')->where('prewedding', 1)->where('plusOne', '!=', null)->count();
       }
