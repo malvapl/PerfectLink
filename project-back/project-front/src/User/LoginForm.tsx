@@ -144,7 +144,7 @@ function LoginForm(props: { dialogLogin?: (open: boolean, action: 'join' | 'crea
                     </Grid>
                 </form>
                 <hr />
-                <p className='text-center mt-5'>¿Todavía no tienes una cuenta?, inicia sesión <a href='/register' style={{color: theme.palette.primary.dark}}>aquí</a></p>
+                <p className='text-center mt-5'>¿Todavía no tienes una cuenta?, regístrate <a href='/register' style={{color: theme.palette.primary.dark}}>aquí</a></p>
             </Container>
         </div>
     );
