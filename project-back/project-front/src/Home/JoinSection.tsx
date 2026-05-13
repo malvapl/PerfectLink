@@ -27,36 +27,18 @@ const JoinSection = (props: {
    const [alert, setAlert] = useState<AlertState>({ open: false, variant: 'info', message: '' });
    const [loading, setLoading] = useState(false)
 
-   const joinUser = async (code: string, id: string) => {
-
-      api.get(`users/joinWedding/${code}`)
+   const joinUser = async (code: string) => {
+      api.post('users/joinWedding', {role: props.role, code: code})
          .then((result) => {
-            console.log(result)
-            if (result.error) {
-               setLoading(false);
-               setAlert({ open: true, variant: 'error', message: result.error });
-            } else {
-               window.dispatchEvent(new StorageEvent('storage'));
-               setTimeout(() => {
-                  navigate('/wedding/' + id);
-               }, 3000);
-               setAlert({ open: true, variant: 'success', message: 'Uniéndose a la boda...' });
-            }
+            window.dispatchEvent(new StorageEvent('storage'));
+            setTimeout(() => {
+               navigate('/wedding/' + result.data.id);
+            }, 3000);
+            setAlert({ open: true, variant: 'success', message: 'Uniéndose a la boda...' });
          })
          .catch((error) => {
             setLoading(false);
-            setAlert({ open: true, variant: 'error', message: 'Error' });
-         })
-   };
-
-   const checkCode = async (code: string) => {
-      api.get(`wedding/code${props.role}/${code}`, false)
-         .then((result) => {
-            joinUser(code, result.id);
-         })
-         .catch((error) => {
-            setLoading(false);
-            setShowAlert(true);
+            setAlert({ open: true, variant: 'error', message: error });
          })
    };
 
@@ -73,7 +55,7 @@ const JoinSection = (props: {
    function handleJoin() {
       if (auth) {
          setLoading(true)
-         checkCode(code);
+         joinUser(code);
       } else {
          props.setDialog({ open: true, action: 'join' });
       }
