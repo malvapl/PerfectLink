@@ -87,7 +87,6 @@ const JoinSection = (props: {
             <h4>{props.message}</h4>
          </Grid>
          <Grid item xs={12} lg={6} sx={{display: 'flex'}}>
-            {/* <Box sx={{ display: 'flex', alignItems: 'center' }}> */}
                <TextField
                   label="Código"
                   size='small'
@@ -105,7 +104,6 @@ const JoinSection = (props: {
                      Unirse
                   </Button>
                )}
-            {/* </Box> */}
          </Grid>
       </Grid>
    </>)
