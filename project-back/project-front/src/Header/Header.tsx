@@ -346,28 +346,6 @@ function Header() {
                      </MenuItem>
                   ))}
                </Menu>
-               {/* <Box sx={{ display: { xs: 'none', md: 'flex' }, justifySelf: 'flex-end' }}>
-                      <NavLink
-                         to={'/login'}
-                         className='text-decoration-none'
-                      >
-                         <Button
-                            sx={{ display: 'block', color: 'black' }}
-                         >
-                            Iniciar sesión
-                         </Button>
-                      </NavLink>
-                      <NavLink
-                         to={'/register'}
-                         className='text-decoration-none'
-                      >
-                         <Button
-                            sx={{ display: 'block', color: 'black' }}
-                         >
-                            Registrarse
-                         </Button>
-                      </NavLink>
-                   </Box> */}
             </Box>
          </Toolbar>
       </AppBar>
