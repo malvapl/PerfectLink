@@ -50,6 +50,14 @@ class WeddingPolicy
     }
 
     /**
+     * GuestPending, guestConfirmed
+     */
+    public function manageInvite(User $user, Wedding $wedding): bool
+    {
+        return $this->hasWeddingRole($user, $wedding, [2, 3]);
+    }
+
+    /**
      * Check if user has any of the specified roles for the wedding.
      */
     private function hasWeddingRole(User $user, Wedding $wedding, array $roleIds): bool
