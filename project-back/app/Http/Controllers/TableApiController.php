@@ -39,17 +39,15 @@ class TableApiController extends Controller
          return ['success' => false, 'message' => 'Error updating table'];
       }
 
-      if (isset($data['guests'])) {
-         foreach ($table->users()->get() as $user) {
-            $table->users()->detach($user->id);
-         }
+      foreach ($table->users()->get() as $user) {
+         $table->users()->detach($user->id);
+      }
 
-         foreach ($data['guests'] as $guest) {
-            $user = User::find($guest['id']);
-            abort_if(!$user, response()->json(['message' => 'User not found'], 404));
+      foreach ($data['guests'] as $guest) {
+         $user = User::find($guest['id']);
+         abort_if(!$user, response()->json(['message' => 'User not found'], 404));
 
-            $table->users()->attach($user->id, ['plusOne' => str_contains($guest['name'], '(+1)'), 'numSeat' => $guest['numSeat']]);
-         }
+         $table->users()->attach($user->id, ['plusOne' => str_contains($guest['name'], '(+1)'), 'numSeat' => $guest['numSeat']]);
       }
 
       return ['success' => true];
