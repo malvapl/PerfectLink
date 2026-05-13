@@ -18,10 +18,6 @@ Route::post('register', [UserApiController::class, 'register']);
 Route::post('login', [UserApiController::class, 'login']);
 Route::get('searchEmail/{email}', [VerificationApiController::class, 'searchEmail']);
 
-// join wedding
-Route::get('wedding/codeGuest/{code}', [UserApiController::class, 'existsCodeGuest']);
-Route::get('wedding/codeOrg/{code}', [UserApiController::class, 'existsCodeOrg']);
-
 Route::middleware(['auth:sanctum', 'can:view,wedding'])->group(function () {
    Route::get('wedding/{wedding}', [WeddingApiController::class, 'show']);
    Route::get('weddingInfo/{wedding}', [WeddingApiController::class, 'getInfo']);
@@ -74,7 +70,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
    Route::get('users/weddings', [UserApiController::class, 'weddings']);
    Route::get('userRole/{wedding}', [UserApiController::class, 'roleWedding']);
    Route::get('checkAdmin', [UserApiController::class, 'isAdmin']);
-   Route::get('users/joinWedding/{code}', [UserApiController::class, 'joinWedding']);
+   Route::post('users/joinWedding', [UserApiController::class, 'joinWedding']);
 
    Route::post('weddings', [WeddingApiController::class, 'store'])->middleware('can:create,App\\Models\\Wedding');
    Route::get('weddings', [WeddingApiController::class, 'index'])->middleware('can:viewAny,App\\Models\\Wedding');
