@@ -121,8 +121,8 @@ class WeddingApiController extends Controller
    public function getBuses(Wedding $wedding, Request $request)
    {
       $wedding->load('users', 'tables.users', 'infos');
-      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
-      abort_if(!$wedding->bus, response()->json(['message' => 'Buses not found'], 404));
+      abort_if(!$wedding, response()->json(['message' => 'Boda no encontrada'], 404));
+      abort_if(!$wedding->bus, response()->json(['message' => 'Buses no encontrados'], 404));
 
       $buses = Bus::where('wedding_id', $wedding->id)->get();
 
@@ -132,10 +132,10 @@ class WeddingApiController extends Controller
    public function getPrewedding(Wedding $wedding, Request $request)
    {
       $wedding->load('users', 'tables.users', 'infos');
-      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
+      abort_if(!$wedding, response()->json(['message' => 'Boda no encontrada'], 404));
 
       $pw = Prewedding::where('wedding_id', $wedding->id)->first();
-      abort_if(!$pw, response()->json(['message' => 'Prewedding not found'], 404));
+      abort_if(!$pw, response()->json(['message' => 'Preboda no encontrada'], 404));
 
       return new PreweddingResource($pw);
    }
@@ -143,7 +143,7 @@ class WeddingApiController extends Controller
    public function update(WeddingUpdateRequest $request, string $idWedding)
    {
       $wedding = $request->user()->weddings()->withPivot('role_id')->where('wedding_id', $idWedding)->first();
-      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
+      abort_if(!$wedding, response()->json(['message' => 'Boda no encontrada'], 404));
 
       $data = $request->all();
 
@@ -163,7 +163,7 @@ class WeddingApiController extends Controller
 
       if ($data['deleted']) {
          $bus = Bus::find($data['id']);
-         return ['success' => (bool) $bus->delete(), 'message' => 'Bus deleted'];
+         return ['success' => (bool) $bus->delete(), 'message' => 'Bus eliminado'];
       }
 
       if (isset($data['id'])) {
@@ -172,11 +172,11 @@ class WeddingApiController extends Controller
          $bus->direction = $data['direction'];
          $bus->start = $data['start'];
          $bus->end = $data['end'];
-         return ['success' => (bool) $bus->save(), 'message' => 'Bus updated'];
+         return ['success' => (bool) $bus->save(), 'message' => 'Bus actualizado'];
       }
 
       $data['wedding_id'] = $idWedding;
-      return ['success' => (bool) Bus::create($data), 'message' => 'Bus created'];
+      return ['success' => (bool) Bus::create($data), 'message' => 'Bus creado'];
    }
 
    public function addBus(CreateBusWeddingRequest $request, string $idWedding)
@@ -237,7 +237,7 @@ class WeddingApiController extends Controller
 
       if (isset($data['subtitle']) && $data['subtitle'] == 'delete' && isset($data['id'])) {
          $info = Info::find($data['id']);
-         return ['success' => (bool) $info->delete(), 'message' => 'Card deleted'];
+         return ['success' => (bool) $info->delete(), 'message' => 'Eliminado'];
       }
 
       if (isset($data['id'])) {
@@ -247,11 +247,11 @@ class WeddingApiController extends Controller
          $info->description = $data['description'];
          $info->delete = $data['delete'];
          $info->enabled = $data['enabled'];
-         return ['success' => (bool) $info->save(), 'message' => 'Card updated'];
+         return ['success' => (bool) $info->save(), 'message' => 'Actualizado'];
       }
 
       $data['wedding_id'] = $idWedding;
-      return ['success' => (bool) Info::create($data), 'message' => 'Card created'];
+      return ['success' => (bool) Info::create($data), 'message' => 'Creado'];
    }
 
    public function addInfoCard(CreateInfoWeddingRequest $request, string $idWedding)

@@ -51,7 +51,7 @@ class GuestApiController extends Controller
 
       $data = $request->all();
       $wedding = $user->weddings()->with('users')->withPivot('role_id')->where('wedding_id', $idWedding)->first();
-      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
+      abort_if(!$wedding, response()->json(['message' => 'Boda no encontrada'], 404));
 
       $wedding->users()->updateExistingPivot($id_user, ['role_id' => 3, 'bus' => $data['bus'], 'prewedding' => $data['prewedding']]);
       if (isset($data['plusOne'])) {
@@ -80,7 +80,7 @@ class GuestApiController extends Controller
       $user = $request->user();
 
       $wedding = $user->weddings()->with('users')->withPivot('role_id', 'plusOne')->where('wedding_id', $idWedding)->first();
-      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
+      abort_if(!$wedding, response()->json(['message' => 'Boda no encontrada'], 404));
 
       $wedding->users()->updateExistingPivot($user->id, ['role_id' => 4, 'bus' => 0, 'prewedding' => 0, 'group' => null, 'infoMenu' => null, 'suggestion' => null]);
       if ($wedding->pivot->plusOne !== null) {
@@ -98,7 +98,7 @@ class GuestApiController extends Controller
    public function dataGuests(Wedding $wedding, Request $request)
    {
       $wedding->load('users', 'buses', 'prewedding');
-      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
+      abort_if(!$wedding, response()->json(['message' => 'Boda no encontrada'], 404));
 
       $totalConfirmed = $wedding->users()->withPivot('role_id')->where('role_id', 3)->count();
       $totalConfirmed += $wedding->users()->withPivot('role_id')->where('role_id', 3)->where('plusOne', '!=', null)->count();
@@ -120,7 +120,7 @@ class GuestApiController extends Controller
     */
    public function guestGroups(Request $request, Wedding $wedding)
    {
-      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
+      abort_if(!$wedding, response()->json(['message' => 'Boda no encontrada'], 404));
 
       $type = DB::select('SHOW COLUMNS FROM user_wedding WHERE Field = "group"')[0]->Type;
       $type = str_replace(['enum(\'', ')'], '', $type);
@@ -143,7 +143,7 @@ class GuestApiController extends Controller
       $wedding->load('users');
 
       $guest = $wedding->users()->where('user_id', $idGuest)->first();
-      abort_if(!$guest, response()->json(['message' => 'Guest not found'], 404));
+      abort_if(!$guest, response()->json(['message' => 'Invitado no encontrado'], 404));
 
       $data = $request->all();
 

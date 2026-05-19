@@ -36,7 +36,7 @@ class TableApiController extends Controller
       $data = $request->all();
 
       if (!$table->update($data)) {
-         return ['success' => false, 'message' => 'Error updating table'];
+         return ['success' => false, 'message' => 'Error al actualizar mesa'];
       }
 
       foreach ($table->users()->get() as $user) {
@@ -45,7 +45,7 @@ class TableApiController extends Controller
 
       foreach ($data['guests'] as $guest) {
          $user = User::find($guest['id']);
-         abort_if(!$user, response()->json(['message' => 'User not found'], 404));
+         abort_if(!$user, response()->json(['message' => 'Usuario no encontrado'], 404));
 
          $table->users()->attach($user->id, ['plusOne' => str_contains($guest['name'], '(+1)'), 'numSeat' => $guest['numSeat']]);
       }

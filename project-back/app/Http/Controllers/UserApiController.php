@@ -80,7 +80,7 @@ class UserApiController extends Controller
       $data = $request->all();
 
       $wedding = Wedding::where('code' . $data['role'], $data['code'])->first();
-      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
+      abort_if(!$wedding, response()->json(['message' => 'Boda no encontrada'], 404));
 
       if (strtolower($data['role']) === 'org') {
          if ($user->hasOwnWedding() !== 0) {
@@ -120,7 +120,7 @@ class UserApiController extends Controller
       }
 
       $wedding = $user->weddings()->withPivot('role_id')->where('wedding_id', $idWedding)->first();
-      abort_if(!$wedding, response()->json(['message' => 'Wedding not found'], 404));
+      abort_if(!$wedding, response()->json(['message' => 'Boda no encontrada'], 404));
 
       $role_id = $wedding->pivot->role_id;
       $role = DB::table('roles')->where('id', $role_id)->value('name');
